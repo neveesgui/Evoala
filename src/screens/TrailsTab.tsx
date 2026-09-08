@@ -1,6 +1,6 @@
 import { softSkillsModules } from '../data/lessonsData';
 import { useAppStore } from '../store/useAppStore';
-import { Check, Lock, Sparkles, BrainCircuit, Leaf, BookOpen } from 'lucide-react';
+import { Check, Lock, Leaf, BookOpen } from 'lucide-react';
 
 export function TrailsTab({ onSelectLesson }: { onSelectLesson: (l: any) => void }) {
   const { completedLessons, hasCompletedLeveling } = useAppStore();
