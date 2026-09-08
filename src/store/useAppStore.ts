@@ -25,6 +25,9 @@ const safeStorage = {
 };
 
 interface AppState {
+  hasOnboarded: boolean;
+  userName: string;
+  userAge: string;
   xp: number;
   streak: number;
   leaves: number;
@@ -32,6 +35,7 @@ interface AppState {
   isDarkMode: boolean;
   hasCompletedLeveling: boolean;
   userLevel: 'Júnior' | 'Pleno' | 'Sênior' | null;
+  completeOnboarding: (name: string, age: string) => void;
   toggleDarkMode: () => void;
   completeLeveling: (level: 'Júnior' | 'Pleno' | 'Sênior', startingXp: number) => void;
   addXp: (amount: number) => void;
@@ -42,6 +46,9 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
+      hasOnboarded: false,
+      userName: '',
+      userAge: '',
       xp: 0,
       streak: 1,
       leaves: 10,
@@ -49,6 +56,7 @@ export const useAppStore = create<AppState>()(
       isDarkMode: true,
       hasCompletedLeveling: false,
       userLevel: null,
+      completeOnboarding: (name, age) => set({ hasOnboarded: true, userName: name, userAge: age }),
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       completeLeveling: (level, startingXp) => set({ hasCompletedLeveling: true, userLevel: level, xp: startingXp }),
       addXp: (amount) => set((state) => ({ xp: state.xp + amount })),

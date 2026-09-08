@@ -1,43 +1,52 @@
-import { BookOpen, Mic, Swords, BarChart2, User } from 'lucide-react';
+import { Compass, User, Trophy, Mic, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function NavigationBar({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) {
   const tabs = [
-    { id: 'trail', icon: BookOpen, label: 'Trilha' },
-    { id: 'simulator', icon: Mic, label: 'Voz AI' },
-    { id: 'duets', icon: Swords, label: 'Duetos' },
-    { id: 'league', icon: BarChart2, label: 'Ligas' },
-    { id: 'profile', icon: User, label: 'Perfil' },
+    { id: 'trail', icon: Compass, label: 'Trilha' },
+    { id: 'duets', icon: Shield, label: 'Duetos' },
+    { id: 'simulator', icon: Mic, label: 'Simular' },
+    { id: 'league', icon: Trophy, label: 'Liga' },
+    { id: 'profile', icon: User, label: 'Perfil' }
   ];
 
   return (
-    <nav className="w-full shrink-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800/80 pb-safe z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
-      <div className="flex justify-around items-center p-2 relative">
+    <div className="absolute bottom-6 left-0 right-0 px-6 z-40 pointer-events-none">
+      <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 rounded-[28px] p-2 flex justify-between items-center shadow-2xl shadow-sky-900/10 pointer-events-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
+          const Icon = tab.icon;
           return (
-            <motion.button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              whileTap={{ scale: 0.85 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className={`relative flex flex-col items-center p-2 min-w-[64px] z-10 ${isActive ? 'text-sky-500' : 'text-slate-400 dark:text-slate-500'}`}
+              className="relative flex-1 flex flex-col items-center justify-center py-2.5 outline-none -webkit-tap-highlight-color-transparent group"
             >
               {isActive && (
-                <motion.div 
-                  layoutId="nav-pill"
-                  className="absolute inset-0 bg-sky-500/10 dark:bg-sky-500/20 rounded-2xl -z-10"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                <motion.div
+                  layoutId="active-nav-pill"
+                  className="absolute inset-0 bg-sky-500/15 rounded-3xl"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <motion.div animate={{ y: isActive ? -4 : 0 }} transition={{ type: "spring", stiffness: 300 }}>
-                <tab.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+              
+              <motion.div 
+                whileTap={{ scale: 0.85 }}
+                className="relative z-10 flex flex-col items-center gap-1"
+              >
+                <Icon 
+                  size={22} 
+                  className={`transition-colors duration-300 ${isActive ? 'text-sky-400' : 'text-slate-500 group-hover:text-slate-400'}`} 
+                  strokeWidth={isActive ? 2.5 : 2}
+                />
+                <span className={`text-[9px] font-bold tracking-wide transition-colors duration-300 ${isActive ? 'text-sky-400' : 'text-slate-500'}`}>
+                  {tab.label}
+                </span>
               </motion.div>
-              <span className="text-[10px] mt-1 font-bold tracking-wide">{tab.label}</span>
-            </motion.button>
+            </button>
           );
         })}
       </div>
-    </nav>
+    </div>
   );
 }
