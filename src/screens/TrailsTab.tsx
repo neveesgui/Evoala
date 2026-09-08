@@ -1,7 +1,7 @@
 import { softSkillsModules } from '../data/lessonsData';
 import { useAppStore } from '../store/useAppStore';
 import { Check, Lock, Leaf, BookOpen } from 'lucide-react';
-import { motion, Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 export function TrailsTab({ onSelectLesson }: { onSelectLesson: (l: any) => void }) {
   const { completedLessons, hasCompletedLeveling } = useAppStore();
 
@@ -15,7 +15,7 @@ export function TrailsTab({ onSelectLesson }: { onSelectLesson: (l: any) => void
   };
 
   // Variáveis de animação em cascata (Framer Motion)
-const containerVariants: Variants = {
+const containerVariants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
@@ -23,11 +23,10 @@ const containerVariants: Variants = {
     }
   };
 
-  const itemVariants: Variants = {
+  const itemVariants = {
     hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    show: { opacity: 1, y: 0 }
   };
-
   return (
     <div className="p-6">
       <div className="mb-6">
