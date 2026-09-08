@@ -1,13 +1,17 @@
 import { softSkillsModules } from '../data/lessonsData';
 import { useAppStore } from '../store/useAppStore';
 import { Check, Lock, Sparkles, BrainCircuit, Leaf, BookOpen } from 'lucide-react';
+
 export function TrailsTab({ onSelectLesson }: { onSelectLesson: (l: any) => void }) {
-  const { completedLessons, hasCompletedLeveling, completeLeveling } = useAppStore();
+  const { completedLessons, hasCompletedLeveling } = useAppStore();
 
   const themeGradients = {
     emerald: 'from-emerald-400 to-teal-500',
+    green: 'from-green-400 to-emerald-500',
     orange: 'from-orange-400 to-rose-500',
-    green: 'from-green-400 to-emerald-500'
+    blue: 'from-blue-400 to-indigo-500',
+    purple: 'from-purple-400 to-fuchsia-500',
+    rose: 'from-rose-400 to-pink-500'
   };
 
   return (
@@ -17,28 +21,12 @@ export function TrailsTab({ onSelectLesson }: { onSelectLesson: (l: any) => void
         <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Trilha de Soft Skills</h1>
       </div>
 
-      {/* Avaliação de Nivelamento IA */}
-      {!hasCompletedLeveling && (
-        <div className="mb-8 p-1 rounded-3xl bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 animate-pulse-slow">
-          <div className="bg-white dark:bg-slate-900 rounded-[22px] p-6 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10"><BrainCircuit size={64} /></div>
-            <Sparkles className="text-purple-500 mx-auto mb-3" size={32} />
-            <h2 className="text-xl font-bold mb-2">Avaliação de Nivelamento</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Descubra seu perfil comportamental corporativo para adaptarmos as perguntas ao seu nível.</p>
-            <button onClick={completeLeveling} className="w-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3 rounded-2xl active:scale-95 transition-transform">
-              Iniciar Diagnóstico
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Módulos */}
       <div className={`transition-opacity duration-500 ${hasCompletedLeveling ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
         {softSkillsModules.map((module) => (
           <div key={module.id} className="mb-10">
-            <div className={`bg-gradient-to-r ${themeGradients[module.theme]} p-5 rounded-3xl text-white mb-6 shadow-lg shadow-${module.theme}-500/20`}>
+            <div className={`bg-gradient-to-r ${themeGradients[module.theme]} p-5 rounded-3xl text-white mb-6 shadow-lg`}>
               <h2 className="text-xl font-bold flex items-center gap-2"><Leaf size={20} /> {module.title}</h2>
-              <p className="text-sm opacity-90 mt-1">Conclua lições para destravar o simulador.</p>
+              <p className="text-sm opacity-90 mt-1">Conclua lições para avançar.</p>
             </div>
             
             <div className="flex flex-col gap-4 relative px-2">

@@ -30,8 +30,6 @@ export function LeagueTab() {
 
   const currentUserData = leaderboard.find(u => u.current);
   const userRankPosition = currentUserData?.rank || 0;
-  const userElo = getUserRank(xp);
-
   return (
     <div className="p-6">
       <div className="flex items-center gap-2 mb-1">

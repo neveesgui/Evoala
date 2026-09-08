@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrainCircuit, Loader2, Sparkles, Target } from 'lucide-react';
+import { BrainCircuit, Loader2, Target } from 'lucide-react';
 import { useAppStore } from '../store/useAppStore';
 
 const aiQuestions = [
