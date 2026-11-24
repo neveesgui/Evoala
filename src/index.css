@@ -1,7 +1,152 @@
 @import "tailwindcss";
 
+@theme {
+  /* Official Evoala Brand Palette */
+  --color-evoala-blue: #29B6F6;
+  --color-evoala-blue-deep: #1CA3EC;
+  --color-evoala-ink: #1A1D20;
+  --color-evoala-green: #43B02A;
+  --color-evoala-green-dark: #2D7A1C;
+  --color-evoala-gold: #FFC107;
+  --color-evoala-gold-light: #FFD54F;
+  --color-evoala-gold-dark: #D39E00;
+  --color-evoala-orange: #FF6D00;
+  --color-evoala-orange-dark: #CC5500;
+  --color-evoala-coral: #FF5252;
+  --color-evoala-coral-dark: #C62828;
+  --color-evoala-purple: #7C4DFF;
+  --color-evoala-purple-dark: #512DA8;
+  --color-evoala-locked: #E0E4E8;
+  --color-evoala-locked-icon: #8C959F;
+
+  /* Typography */
+  --font-display: "Fredoka", "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Tactile Neo-Brutalist Shadows */
+  --shadow-tactile: 0px 4px 0px #1A1D20;
+  --shadow-tactile-sm: 0px 2px 0px #1A1D20;
+  --shadow-tactile-lg: 0px 6px 0px #1A1D20;
+  --shadow-tactile-green: 0px 4px 0px #2D7A1C;
+  --shadow-tactile-gold: 0px 4px 0px #D39E00;
+  --shadow-tactile-coral: 0px 4px 0px #C62828;
+  --shadow-tactile-purple: 0px 4px 0px #512DA8;
+}
+
+@layer base {
+  html,
+  body {
+    font-family: var(--font-sans);
+    color: #1A1D20;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* Tactile Cartoon / Soft Neo-Brutalism Utilities */
+.tactile-card {
+  background-color: #FFFFFF;
+  border: 2.5px solid #1A1D20;
+  box-shadow: 0px 4px 0px #1A1D20;
+  border-radius: 1.5rem;
+}
+
+.tactile-card-interactive {
+  background-color: #FFFFFF;
+  border: 2.5px solid #1A1D20;
+  box-shadow: 0px 4px 0px #1A1D20;
+  border-radius: 1.5rem;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
+}
+
+.tactile-card-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0px 5px 0px #1A1D20;
+}
+
+.tactile-card-interactive:active {
+  transform: translateY(3px);
+  box-shadow: 0px 1px 0px #1A1D20;
+}
+
+.text-cartoon-shadow {
+  text-shadow: 0px 2px 0px rgba(26, 29, 32, 0.35);
+}
+
+.text-cartoon-outline {
+  text-shadow:
+    -1.5px -1.5px 0 #1A1D20,
+    1.5px -1.5px 0 #1A1D20,
+    -1.5px 1.5px 0 #1A1D20,
+    1.5px 1.5px 0 #1A1D20,
+    0px 3px 0 #1A1D20;
+}
+
+/* Safe area support for Capacitor / iOS / Android */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+}
+
+/* Animations */
+@keyframes screen-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: screen-shake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-12px) scale(1.03); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes sheen-slide {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+
+.progress-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  animation: sheen-slide 2.4s ease-in-out infinite;
+}
+
+/* Clean scrollbars inside mobile frame */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -1,45 +1,60 @@
-import { Compass, User, Trophy, Mic, Shield } from 'lucide-react';
+import { Map, BrainCircuit, Trophy, BarChart3, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { soundFX } from '../utils/soundEffects';
 
-export default function NavigationBar({ activeTab, setActiveTab }: { activeTab: string, setActiveTab: (t: string) => void }) {
-  const tabs = [
-    { id: 'trail', icon: Compass, label: 'Trilha' },
-    { id: 'duets', icon: Shield, label: 'Duetos' },
-    { id: 'simulator', icon: Mic, label: 'Simular' },
-    { id: 'league', icon: Trophy, label: 'Liga' },
-    { id: 'profile', icon: User, label: 'Perfil' }
-  ];
+export type AppTabId = 'trail' | 'gatekeeper' | 'league' | 'evolution' | 'profile';
 
+interface NavigationBarProps {
+  activeTab: AppTabId;
+  setActiveTab: (tab: AppTabId) => void;
+}
+
+const TABS: { id: AppTabId; label: string; icon: typeof Map; activeColor: string }[] = [
+  { id: 'trail', label: 'Trilha', icon: Map, activeColor: '#43B02A' },
+  { id: 'gatekeeper', label: 'Gatekeeper', icon: BrainCircuit, activeColor: '#7C4DFF' },
+  { id: 'league', label: 'Ligas', icon: Trophy, activeColor: '#D39E00' },
+  { id: 'evolution', label: 'Evolução', icon: BarChart3, activeColor: '#29B6F6' },
+  { id: 'profile', label: 'Perfil', icon: User, activeColor: '#FF6D00' },
+];
+
+export default function NavigationBar({ activeTab, setActiveTab }: NavigationBarProps) {
   return (
-    <div className="absolute bottom-6 left-0 right-0 px-6 z-40 pointer-events-none">
-      <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 rounded-[28px] p-2 flex justify-between items-center shadow-2xl shadow-sky-900/10 pointer-events-auto">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
+    <nav className="sticky bottom-0 left-0 right-0 z-40 bg-white border-t-[2.5px] border-[#1A1D20] px-2 pt-2 pb-2 pb-safe">
+      <div className="flex items-center justify-between gap-1">
+        {TABS.map((tab) => {
           const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className="relative flex-1 flex flex-col items-center justify-center py-2.5 outline-none -webkit-tap-highlight-color-transparent group"
+              onClick={() => {
+                if (!isActive) soundFX.playTap();
+                setActiveTab(tab.id);
+              }}
+              className="relative flex-1 flex flex-col items-center justify-center py-1.5 rounded-2xl cursor-pointer outline-none select-none"
             >
               {isActive && (
                 <motion.div
-                  layoutId="active-nav-pill"
-                  className="absolute inset-0 bg-sky-500/15 rounded-3xl"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  layoutId="evoala-nav-pill"
+                  transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                  className="absolute inset-0 bg-[#E1F5FE] border-2 border-[#1A1D20] shadow-[0px_2px_0px_#1A1D20] rounded-2xl"
                 />
               )}
-              
-              <motion.div 
-                whileTap={{ scale: 0.85 }}
-                className="relative z-10 flex flex-col items-center gap-1"
+
+              <motion.div
+                whileTap={{ scale: 0.86 }}
+                className="relative z-10 flex flex-col items-center gap-0.5"
               >
-                <Icon 
-                  size={22} 
-                  className={`transition-colors duration-300 ${isActive ? 'text-sky-400' : 'text-slate-500 group-hover:text-slate-400'}`} 
-                  strokeWidth={isActive ? 2.5 : 2}
+                <Icon
+                  size={21}
+                  strokeWidth={isActive ? 2.6 : 2.1}
+                  style={{ color: isActive ? tab.activeColor : '#64748B' }}
                 />
-                <span className={`text-[9px] font-bold tracking-wide transition-colors duration-300 ${isActive ? 'text-sky-400' : 'text-slate-500'}`}>
+                <span
+                  className={`text-[10px] font-extrabold tracking-tight ${
+                    isActive ? 'text-[#1A1D20]' : 'text-slate-500'
+                  }`}
+                >
                   {tab.label}
                 </span>
               </motion.div>
@@ -47,6 +62,6 @@ export default function NavigationBar({ activeTab, setActiveTab }: { activeTab: 
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }

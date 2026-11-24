@@ -1,114 +1,168 @@
-import { useAppStore, getUserRank } from '../store/useAppStore';
-import { Trophy, ChevronUp, ChevronDown, Minus } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Trophy, ArrowUp, ArrowDown, Crown, Sparkles } from 'lucide-react';
+import { useAppStore, getUserRank, RANK_THRESHOLDS } from '../store/useAppStore';
+import { TactileCard } from '../components/ui/TactileUI';
+
+const MOCK_COMPETITORS = [
+  { id: 'c1', name: 'Gabriela L.', initials: 'GL', avatarBg: '#7C4DFF', xp: 2650 },
+  { id: 'c2', name: 'Heitor P.', initials: 'HP', avatarBg: '#FF6D00', xp: 1920 },
+  { id: 'c3', name: 'Isabela N.', initials: 'IN', avatarBg: '#43B02A', xp: 1410 },
+  { id: 'c4', name: 'Ana C.', initials: 'AC', avatarBg: '#29B6F6', xp: 980 },
+  { id: 'c5', name: 'Felipe M.', initials: 'FM', avatarBg: '#FFC107', xp: 640 },
+  { id: 'c6', name: 'Lucas R.', initials: 'LR', avatarBg: '#FF5252', xp: 390 },
+  { id: 'c7', name: 'Mariana T.', initials: 'MT', avatarBg: '#00897B', xp: 210 },
+  { id: 'c8', name: 'João V.', initials: 'JV', avatarBg: '#607D8B', xp: 90 },
+];
 
 export function LeagueTab() {
-  const { xp } = useAppStore();
+  const { xp, userName } = useAppStore();
+  const currentRank = getUserRank(xp);
 
-  // O banco de dados de competidores simulados
-  const baseLeaderboard = [
-    { id: '1', name: 'Gabriela L.', xp: 4950, current: false },
-    { id: '2', name: 'Heitor P.', xp: 3600, current: false },
-    { id: '3', name: 'Isabela N.', xp: 2550, current: false },
-    { id: '4', name: 'Ana C.', xp: 1850, current: false },
-    { id: '5', name: 'Carla S.', xp: 1200, current: false },
-    { id: '6', name: 'Felipe M.', xp: 750, current: false },
-    { id: '7', name: 'Lucas R.', xp: 300, current: false },
-    { id: '8', name: 'Mariana T.', xp: 150, current: false },
-    { id: '9', name: 'João V.', xp: 50, current: false },
-    { id: 'user', name: 'Você', xp: xp, current: true }, // Seu XP real injetado
-  ];
+  const leaderboard = [
+    ...MOCK_COMPETITORS.map((c) => ({ ...c, isUser: false })),
+    {
+      id: 'current-user',
+      name: userName || 'Você',
+      initials: (userName || 'VC').slice(0, 2).toUpperCase(),
+      avatarBg: '#FFC107',
+      xp,
+      isUser: true,
+    },
+  ].sort((a, b) => b.xp - a.xp);
 
-  // Ordenação automática do maior para o menor XP
-  const leaderboard = baseLeaderboard
-    .sort((a, b) => b.xp - a.xp)
-    .map((user, index) => {
-      let trend: 'up' | 'down' | 'same' = 'same';
-      if (index % 3 === 0) trend = 'up';
-      else if (index % 2 === 0) trend = 'down';
-      return { ...user, rank: index + 1, trend };
-    });
+  const userPosition = leaderboard.findIndex((u) => u.isUser) + 1;
 
-  const currentUserData = leaderboard.find(u => u.current);
-  const userRankPosition = currentUserData?.rank || 0;
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-2 mb-1">
-        <Trophy size={16} className="text-sky-500" />
-        <p className="text-xs font-bold uppercase tracking-widest text-sky-500">Temporada 1</p>
-      </div>
-      <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight mb-8">Ligas & Ranking</h1>
-
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-white mb-8 shadow-xl relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-r from-sky-500/20 to-purple-500/20 opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-4xl filter drop-shadow-md">🐨</span>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">Sua posição</h2>
-              <p className="text-sm text-slate-400 font-medium">{xp} XP Acumulado</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">
-              #{userRankPosition}
+    <div className="px-4 pt-5 pb-10">
+      {/* League Hero Banner */}
+      <div className="bg-[#FFC107] border-[2.5px] border-[#1A1D20] shadow-[0px_5px_0px_#1A1D20] rounded-3xl p-4 mb-5 text-[#1A1D20]">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="inline-flex items-center gap-1 bg-white border-2 border-[#1A1D20] px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase mb-1.5">
+              <Trophy size={11} className="text-[#D39E00]" /> RANKING SEMANAL
             </span>
+            <h1 className="font-display text-2xl font-bold leading-tight">
+              Liga {currentRank.name}
+            </h1>
+            <p className="text-xs font-bold text-[#1A1D20]/80 mt-0.5">
+              Top 3 sobem de Elo no domingo!
+            </p>
           </div>
+          <div className="bg-white border-[2.5px] border-[#1A1D20] shadow-[0px_3px_0px_#1A1D20] rounded-2xl px-3.5 py-2 text-center shrink-0">
+            <span className="block text-[10px] font-extrabold uppercase text-slate-400">Posição</span>
+            <span className="font-display text-2xl font-bold text-[#1A1D20]">#{userPosition}</span>
+          </div>
+        </div>
+
+        {/* Elo Ladder Mini Strip */}
+        <div className="flex items-center gap-1.5 mt-4 overflow-x-auto no-scrollbar pb-1">
+          {RANK_THRESHOLDS.map((elo) => {
+            const EloIcon = elo.icon;
+            const isActive = elo.name === currentRank.name;
+            return (
+              <div
+                key={elo.name}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl border-2 text-[10px] font-extrabold shrink-0 ${
+                  isActive
+                    ? 'bg-[#1A1D20] text-[#FFC107] border-[#1A1D20]'
+                    : 'bg-white/80 text-[#1A1D20]/70 border-[#1A1D20]/40'
+                }`}
+              >
+                <EloIcon size={12} />
+                {elo.name}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {leaderboard.map((user, index) => {
-          const rowElo = getUserRank(user.xp);
-          const EloIcon = rowElo.icon;
-          
-          let zoneClass = "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50";
-          let zoneIndicator = null;
-
-          if (index < 3) {
-            zoneClass = "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/5";
-            zoneIndicator = <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-2xl shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>;
-          } else if (index >= leaderboard.length - 3) {
-            zoneClass = "border-rose-500/30 bg-rose-500/5 dark:bg-rose-500/5";
-            zoneIndicator = <div className="absolute left-0 top-0 bottom-0 w-1 bg-rose-500 rounded-l-2xl"></div>;
-          }
-
-          if (user.current) {
-            zoneClass = "border-sky-500 bg-sky-500/10 shadow-[0_0_15px_rgba(14,165,233,0.15)] ring-1 ring-sky-500/50 animate-pulse-slow";
-          }
+      {/* Leaderboard List */}
+      <TactileCard className="p-3 space-y-2">
+        {leaderboard.map((entry, idx) => {
+          const rankNum = idx + 1;
+          const isPromotion = rankNum <= 3;
+          const isDemotion = rankNum > leaderboard.length - 2;
+          const entryElo = getUserRank(entry.xp);
 
           return (
-            <div key={user.id} className={`relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:scale-[1.02] ${zoneClass}`}>
-              {zoneIndicator}
-              
-              <div className="flex items-center gap-4 pl-2">
-                <span className={`font-black w-6 text-center text-lg ${index === 0 ? 'text-yellow-500' : index === 1 ? 'text-slate-300' : index === 2 ? 'text-orange-400' : 'text-slate-500'}`}>
-                  {user.rank}
-                </span>
-                
-                <div className="flex flex-col items-center justify-center w-6">
-                  {user.trend === 'up' && <ChevronUp size={16} className="text-emerald-500" strokeWidth={3} />}
-                  {user.trend === 'down' && <ChevronDown size={16} className="text-rose-500" strokeWidth={3} />}
-                  {user.trend === 'same' && <Minus size={16} className="text-slate-500" strokeWidth={3} />}
+            <div key={entry.id}>
+              {rankNum === 1 && (
+                <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#2D7A1C] px-2 pb-1.5">
+                  <ArrowUp size={13} strokeWidth={3} /> Zona de Promoção (Top 3)
                 </div>
+              )}
 
-                <div>
-                  <span className={`font-bold block text-[15px] ${user.current ? 'text-sky-600 dark:text-sky-400' : 'text-slate-700 dark:text-slate-200'}`}>
-                    {user.name}
+              {rankNum === 4 && (
+                <div className="flex items-center gap-2 my-2 px-2">
+                  <div className="h-[2px] flex-1 bg-slate-200" />
+                  <span className="text-[10px] font-extrabold uppercase text-slate-400">
+                    Zona de Manutenção
                   </span>
-                  <div className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider ${rowElo.color.split(' ')[0]}`}>
-                    <EloIcon size={10} /> {rowElo.name}
+                  <div className="h-[2px] flex-1 bg-slate-200" />
+                </div>
+              )}
+
+              {rankNum === leaderboard.length - 1 && (
+                <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#C62828] px-2 pt-2 pb-1">
+                  <ArrowDown size={13} strokeWidth={3} /> Zona de Rebaixamento
+                </div>
+              )}
+
+              <motion.div
+                layout
+                className={`flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${
+                  entry.isUser
+                    ? 'bg-[#E1F5FE] border-[#1A1D20] shadow-[0px_3px_0px_#1A1D20]'
+                    : isPromotion
+                      ? 'bg-[#F1FBF0] border-[#43B02A]/40'
+                      : isDemotion
+                        ? 'bg-[#FFF5F5] border-[#FF5252]/35'
+                        : 'bg-white border-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center font-display text-sm font-bold shrink-0 ${
+                      rankNum === 1
+                        ? 'bg-[#FFC107] border-2 border-[#1A1D20] text-[#1A1D20]'
+                        : rankNum === 2
+                          ? 'bg-[#E0E4E8] border-2 border-[#1A1D20] text-[#1A1D20]'
+                          : rankNum === 3
+                            ? 'bg-[#FFCC80] border-2 border-[#1A1D20] text-[#1A1D20]'
+                            : 'text-slate-500'
+                    }`}
+                  >
+                    {rankNum === 1 ? <Crown size={14} /> : rankNum}
+                  </div>
+
+                  <div
+                    className="w-9 h-9 rounded-full border-2 border-[#1A1D20] flex items-center justify-center font-display text-xs font-bold text-white shrink-0"
+                    style={{ backgroundColor: entry.avatarBg }}
+                  >
+                    {entry.initials}
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="font-display text-sm font-bold text-[#1A1D20] truncate">
+                      {entry.name} {entry.isUser && '(Você)'}
+                    </p>
+                    <span className="text-[10px] font-extrabold uppercase text-slate-500">
+                      Elo {entryElo.name}
+                    </span>
                   </div>
                 </div>
-              </div>
 
-              <div className="text-right pr-2">
-                <span className="font-black text-slate-700 dark:text-slate-300">{user.xp}</span>
-                <span className="text-xs text-slate-500 font-bold ml-1">XP</span>
-              </div>
+                <div className="inline-flex items-center gap-1 bg-white border-2 border-[#1A1D20] px-2.5 py-1 rounded-xl shrink-0">
+                  <Sparkles size={12} className="text-[#D39E00]" />
+                  <span className="font-display text-xs font-bold text-[#1A1D20]">
+                    {entry.xp} XP
+                  </span>
+                </div>
+              </motion.div>
             </div>
           );
         })}
-      </div>
+      </TactileCard>
     </div>
   );
 }
