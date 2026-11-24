@@ -54,8 +54,8 @@ export default function App() {
     <div className="min-h-[100dvh] w-full relative flex justify-center overflow-hidden">
       <SkyBackground />
 
-      {/* Mobile-First Centered Frame (PWA & Capacitor Ready) */}
-      <div className="w-full max-w-[480px] h-[100dvh] flex flex-col relative z-10 sm:border-x-[3px] sm:border-[#1A1D20] sm:shadow-2xl bg-gradient-to-b from-[#29B6F6]/40 via-transparent to-[#1CA3EC]/40">
+      {/* Clean Apple + Modern Duolingo Centered App Frame */}
+      <div className="w-full max-w-[480px] h-[100dvh] flex flex-col relative z-10 bg-[#F7F9FA] sm:border-x sm:border-slate-200/90 sm:shadow-[0_0_40px_rgba(15,23,42,0.08)]">
         <TopHeader onSelectUnit={handleSelectUnit} />
 
         <main
@@ -65,9 +65,9 @@ export default function App() {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="min-h-full"
             >

@@ -16,13 +16,12 @@ export function EvolutionTab() {
       5
   );
 
-  // Radar Pentagon coordinates
   const radarAxes = [
-    { label: 'Clareza', value: metrics.clarity, color: '#29B6F6' },
-    { label: 'Empatia', value: metrics.empathy, color: '#FF5252' },
-    { label: 'Controle', value: metrics.control, color: '#43B02A' },
-    { label: 'Liderança', value: metrics.leadership, color: '#FFC107' },
-    { label: 'Negociação', value: metrics.negotiation, color: '#7C4DFF' },
+    { label: 'Clareza', value: metrics.clarity, color: '#1CB0F6' },
+    { label: 'Empatia', value: metrics.empathy, color: '#FF4B4B' },
+    { label: 'Controle', value: metrics.control, color: '#58CC02' },
+    { label: 'Liderança', value: metrics.leadership, color: '#FFC800' },
+    { label: 'Negociação', value: metrics.negotiation, color: '#6366F1' },
   ];
 
   const cx = 110;
@@ -32,10 +31,7 @@ export function EvolutionTab() {
   const getPoint = (index: number, percent: number) => {
     const angle = (Math.PI * 2 * index) / radarAxes.length - Math.PI / 2;
     const r = (percent / 100) * maxR;
-    return {
-      x: cx + r * Math.cos(angle),
-      y: cy + r * Math.sin(angle),
-    };
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
   };
 
   const polygonPoints = radarAxes
@@ -48,34 +44,32 @@ export function EvolutionTab() {
   return (
     <div className="px-4 pt-5 pb-10 space-y-5">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between px-1">
         <div>
-          <span className="inline-flex items-center gap-1 bg-white border-2 border-[#1A1D20] px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase text-[#1A1D20] mb-1">
-            <TrendingUp size={11} className="text-[#43B02A]" /> PAINEL COMPORTAMENTAL
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#58CC02] mb-0.5">
+            <TrendingUp size={12} /> Painel Comportamental
           </span>
-          <h1 className="font-display text-2xl font-bold text-white text-cartoon-outline">
-            Sua Evolução
-          </h1>
+          <h1 className="font-display text-2xl font-black text-slate-800">Sua Evolução</h1>
         </div>
 
-        <div className="bg-white border-[2.5px] border-[#1A1D20] shadow-[0px_4px_0px_#1A1D20] rounded-2xl px-3.5 py-2 text-center">
-          <span className="block text-[9px] font-extrabold uppercase text-slate-400">Prontidão</span>
-          <span className="font-display text-xl font-bold text-[#43B02A]">{avgScore}%</span>
+        <div className="bg-white border border-slate-200 shadow-xs rounded-2xl px-3.5 py-2 text-center">
+          <span className="block text-[9px] font-bold uppercase text-slate-400">Prontidão</span>
+          <span className="font-display text-xl font-black text-[#58CC02]">{avgScore}%</span>
         </div>
       </div>
 
-      {/* 6-Week Vertical Bar Chart (Blue bars + Green current week with Golden Star) */}
-      <TactileCard className="p-4">
+      {/* 6-Week Vertical Bar Chart */}
+      <TactileCard className="p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="font-display text-base font-bold text-[#1A1D20]">
+            <h2 className="font-display text-base font-extrabold text-slate-800">
               Ritmo das Últimas 6 Semanas
             </h2>
-            <p className="text-[11px] font-semibold text-slate-500">
+            <p className="text-[11px] font-medium text-slate-400">
               XP acumulado em trilhas e simulações
             </p>
           </div>
-          <span className="text-[11px] font-extrabold text-[#43B02A] bg-[#E8F5E9] border border-[#1A1D20] px-2 py-0.5 rounded-lg">
+          <span className="text-[11px] font-extrabold text-[#46A302] bg-[#EEFBE5] px-2.5 py-0.5 rounded-full">
             {completedLessons.length} lições
           </span>
         </div>
@@ -84,35 +78,35 @@ export function EvolutionTab() {
           {weeklyXp.map((point, idx) => {
             const heightPct = Math.max(16, Math.round((point.xp / maxWeeklyXp) * 100));
             return (
-              <div key={point.label} className="flex-1 flex flex-col items-center h-full justify-end">
+              <div
+                key={point.label}
+                className="flex-1 flex flex-col items-center h-full justify-end"
+              >
                 <div className="relative w-full flex flex-col items-center justify-end flex-1">
-                  {/* Golden Star floating on top of current week */}
                   {point.isCurrent && (
                     <motion.div
                       animate={{ y: [0, -5, 0], rotate: [-6, 6, -6] }}
                       transition={{ duration: 1.8, repeat: Infinity }}
                       className="mb-1"
                     >
-                      <Star size={20} fill="#FFC107" stroke="#1A1D20" strokeWidth={2.2} />
+                      <Star size={19} fill="#FFC800" stroke="#E5A400" strokeWidth={1.8} />
                     </motion.div>
                   )}
 
-                  <span className="text-[10px] font-extrabold text-slate-500 mb-1">
-                    {point.xp}
-                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 mb-1">{point.xp}</span>
 
                   <motion.div
                     initial={{ height: 0 }}
                     animate={{ height: `${heightPct}%` }}
                     transition={{ duration: 0.65, delay: idx * 0.08, ease: 'easeOut' }}
-                    className={`w-full max-w-[38px] rounded-t-xl border-2 border-[#1A1D20] ${
-                      point.isCurrent ? 'bg-[#43B02A]' : 'bg-[#29B6F6]'
+                    className={`w-full max-w-[34px] rounded-t-xl ${
+                      point.isCurrent ? 'bg-[#58CC02]' : 'bg-[#1CB0F6]/85'
                     }`}
                   />
                 </div>
                 <span
-                  className={`text-[10px] font-extrabold mt-2 ${
-                    point.isCurrent ? 'text-[#2D7A1C]' : 'text-slate-500'
+                  className={`text-[10px] font-bold mt-2 ${
+                    point.isCurrent ? 'text-[#46A302]' : 'text-slate-400'
                   }`}
                 >
                   {point.label}
@@ -124,22 +118,21 @@ export function EvolutionTab() {
       </TactileCard>
 
       {/* Behavioral Radar Chart */}
-      <TactileCard className="p-4">
+      <TactileCard className="p-5">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="font-display text-base font-bold text-[#1A1D20]">
+            <h2 className="font-display text-base font-extrabold text-slate-800">
               Radar de Soft Skills
             </h2>
-            <p className="text-[11px] font-semibold text-slate-500">
+            <p className="text-[11px] font-medium text-slate-400">
               Indicadores quantitativos de maturidade profissional
             </p>
           </div>
-          <Award size={20} className="text-[#7C4DFF]" />
+          <Award size={20} className="text-[#6366F1]" />
         </div>
 
         <div className="flex justify-center my-2">
           <svg width="220" height="210" viewBox="0 0 220 210" className="overflow-visible">
-            {/* Concentric pentagon grid */}
             {[25, 50, 75, 100].map((level) => (
               <polygon
                 key={level}
@@ -150,31 +143,23 @@ export function EvolutionTab() {
                   })
                   .join(' ')}
                 fill="none"
-                stroke="#CBD5E1"
-                strokeWidth="1.5"
+                stroke="#E2E8F0"
+                strokeWidth="1.2"
               />
             ))}
 
-            {/* Axis lines & labels */}
             {radarAxes.map((axis, idx) => {
               const outer = getPoint(idx, 100);
               const labelPos = getPoint(idx, 126);
               return (
                 <g key={axis.label}>
-                  <line
-                    x1={cx}
-                    y1={cy}
-                    x2={outer.x}
-                    y2={outer.y}
-                    stroke="#CBD5E1"
-                    strokeWidth="1.5"
-                  />
+                  <line x1={cx} y1={cy} x2={outer.x} y2={outer.y} stroke="#E2E8F0" strokeWidth="1.2" />
                   <text
                     x={labelPos.x}
                     y={labelPos.y}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    className="fill-[#1A1D20] text-[10px] font-extrabold"
+                    className="fill-slate-600 text-[10px] font-bold"
                   >
                     {axis.label}
                   </text>
@@ -182,20 +167,18 @@ export function EvolutionTab() {
               );
             })}
 
-            {/* Data polygon */}
             <motion.polygon
               initial={{ opacity: 0, scale: 0.6 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
               points={polygonPoints}
-              fill="#29B6F6"
-              fillOpacity="0.32"
-              stroke="#1A1D20"
+              fill="#1CB0F6"
+              fillOpacity="0.2"
+              stroke="#1CB0F6"
               strokeWidth="2.5"
               strokeLinejoin="round"
             />
 
-            {/* Data points */}
             {radarAxes.map((axis, idx) => {
               const p = getPoint(idx, axis.value);
               return (
@@ -205,7 +188,7 @@ export function EvolutionTab() {
                   cy={p.y}
                   r="4.5"
                   fill={axis.color}
-                  stroke="#1A1D20"
+                  stroke="#FFFFFF"
                   strokeWidth="2"
                 />
               );
@@ -213,58 +196,56 @@ export function EvolutionTab() {
           </svg>
         </div>
 
-        {/* Individual Metric Pills */}
         <div className="grid grid-cols-2 gap-2 mt-2">
           {radarAxes.map((axis) => (
             <div
               key={axis.label}
-              className="flex items-center justify-between bg-slate-50 border-2 border-[#1A1D20] rounded-xl px-3 py-2"
+              className="flex items-center justify-between bg-[#F8FAFC] rounded-xl px-3 py-2"
             >
               <div className="flex items-center gap-1.5">
-                <span
-                  className="w-2.5 h-2.5 rounded-full border border-[#1A1D20]"
-                  style={{ backgroundColor: axis.color }}
-                />
-                <span className="text-xs font-bold text-[#1A1D20]">{axis.label}</span>
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: axis.color }} />
+                <span className="text-xs font-semibold text-slate-600">{axis.label}</span>
               </div>
-              <span className="font-display text-xs font-bold text-[#1A1D20]">{axis.value}%</span>
+              <span className="font-display text-xs font-extrabold text-slate-800">
+                {axis.value}%
+              </span>
             </div>
           ))}
         </div>
       </TactileCard>
 
       {/* Recent Gatekeeper Simulations */}
-      <TactileCard className="p-4">
+      <TactileCard className="p-5">
         <div className="flex items-center gap-2 mb-3">
-          <BrainCircuit size={18} className="text-[#7C4DFF]" />
-          <h2 className="font-display text-base font-bold text-[#1A1D20]">
+          <BrainCircuit size={18} className="text-[#6366F1]" />
+          <h2 className="font-display text-base font-extrabold text-slate-800">
             Histórico do Gatekeeper IA
           </h2>
         </div>
 
         {gatekeeperHistory.length === 0 ? (
-          <p className="text-xs font-semibold text-slate-500 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center">
+          <p className="text-xs font-medium text-slate-400 bg-[#F8FAFC] rounded-2xl p-4 text-center">
             Nenhuma simulação concluída ainda. Teste um cenário na aba Gatekeeper para registrar sua
             telemetria!
           </p>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {gatekeeperHistory.slice(0, 4).map((rec) => (
               <div
                 key={rec.id}
-                className="flex items-center justify-between bg-slate-50 border-2 border-[#1A1D20] rounded-2xl p-3"
+                className="flex items-center justify-between bg-[#F8FAFC] rounded-2xl p-3"
               >
                 <div className="min-w-0 pr-2">
-                  <p className="font-display text-xs font-bold text-[#1A1D20] truncate">
+                  <p className="font-display text-xs font-extrabold text-slate-800 truncate">
                     {rec.scenarioTitle}
                   </p>
-                  <p className="text-[10px] font-bold text-slate-500 mt-0.5">
+                  <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
                     Clareza {rec.clarity}% • Empatia {rec.empathy}% • Controle {rec.control}%
                   </p>
                 </div>
-                <div className="flex items-center gap-0.5 shrink-0">
-                  <Star size={14} fill="#FFC107" stroke="#1A1D20" strokeWidth={2} />
-                  <span className="font-display text-xs font-bold text-[#1A1D20]">
+                <div className="flex items-center gap-1 shrink-0">
+                  <Star size={14} fill="#FFC800" stroke="#E5A400" strokeWidth={1.8} />
+                  <span className="font-display text-xs font-extrabold text-slate-700">
                     {rec.stars}/5
                   </span>
                 </div>

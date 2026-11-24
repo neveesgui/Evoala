@@ -1,5 +1,7 @@
 import type { GatekeeperScenario } from '../data/curriculum';
 
+export type AiProviderLabel = 'IA Real • Gemini' | 'IA Real • Gratuita' | 'Motor Local';
+
 export interface GatekeeperEvaluation {
   clarity: number;
   empathy: number;
@@ -7,7 +9,9 @@ export interface GatekeeperEvaluation {
   stars: number;
   headline: string;
   reason: string;
+  personaReply: string;
   xpEarned: number;
+  provider: AiProviderLabel;
 }
 
 const EMPATHY_MARKERS = [
@@ -56,12 +60,142 @@ const REACTIVE_MARKERS = [
   'sempre',
 ];
 
+const clamp = (n: number) => Math.max(20, Math.min(98, Math.round(n)));
+
+function buildSystemPrompt(scenario: GatekeeperScenario): string {
+  return `Você é o Gatekeeper IA do Evoala, um avaliador executivo de Soft Skills e Inteligência Emocional.
+Cenário: "${scenario.title}" (${scenario.context}).
+Interlocutor: ${scenario.personaName} (${scenario.personaRole}), que disse: "${scenario.openingMessage}".
+
+Avalie a resposta do usuário em português (PT-BR) e responda EXCLUSIVAMENTE com um JSON válido neste formato exato:
+{
+  "clarity": <número inteiro de 20 a 98>,
+  "empathy": <número inteiro de 20 a 98>,
+  "control": <número inteiro de 20 a 98>,
+  "stars": <número inteiro de 1 a 5>,
+  "headline": "<título curto de 2 a 4 palavras>",
+  "reason": "<feedback técnico construtivo em 1 ou 2 frases diretas>",
+  "personaReply": "<resposta curta e realista de ${scenario.personaName} reagindo ao que o usuário escreveu, em 1 frase>"
+}`;
+}
+
+function parseAiJson(raw: string, provider: AiProviderLabel): GatekeeperEvaluation | null {
+  try {
+    const start = raw.indexOf('{');
+    const end = raw.lastIndexOf('}');
+    if (start === -1 || end === -1) return null;
+    const parsed = JSON.parse(raw.slice(start, end + 1));
+
+    const clarity = clamp(Number(parsed.clarity) || 70);
+    const empathy = clamp(Number(parsed.empathy) || 70);
+    const control = clamp(Number(parsed.control) || 70);
+    const stars = Math.max(1, Math.min(5, Math.round(Number(parsed.stars) || 3)));
+
+    if (!parsed.headline || !parsed.reason) return null;
+
+    return {
+      clarity,
+      empathy,
+      control,
+      stars,
+      headline: String(parsed.headline).slice(0, 60),
+      reason: String(parsed.reason).slice(0, 320),
+      personaReply: String(
+        parsed.personaReply || 'Entendi seu ponto. Vamos alinhar os próximos passos.'
+      ).slice(0, 220),
+      xpEarned: stars >= 4 ? 25 : 15,
+      provider,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Structured behavioral evaluation engine for Gatekeeper IA.
- * Designed as an isolated service so a live Gemini/OpenAI API call
- * can drop in later without changing any UI component.
+ * Tier 1: Google Gemini 2.5 Flash (Free Tier via Google AI Studio key or VITE_GEMINI_API_KEY)
  */
-export function evaluateGatekeeperResponse(
+async function evaluateWithGemini(
+  scenario: GatekeeperScenario,
+  userResponse: string,
+  apiKey: string
+): Promise<GatekeeperEvaluation | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${buildSystemPrompt(scenario)}\n\nResposta do usuário: "${userResponse}"`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.4,
+          },
+        }),
+      }
+    );
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return null;
+    return parseAiJson(text, 'IA Real • Gemini');
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Tier 2: Free Zero-Key Real LLM via Pollinations AI (CORS-friendly public endpoint)
+ */
+async function evaluateWithFreePublicAI(
+  scenario: GatekeeperScenario,
+  userResponse: string
+): Promise<GatekeeperEvaluation | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7500);
+  try {
+    const res = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: buildSystemPrompt(scenario) },
+          { role: 'user', content: `Resposta do usuário: "${userResponse}"` },
+        ],
+        model: 'openai',
+        jsonMode: true,
+      }),
+    });
+
+    if (!res.ok) return null;
+    const rawText = await res.text();
+    return parseAiJson(rawText, 'IA Real • Gratuita');
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Tier 3: Instant Heuristic Fallback (guaranteed availability even offline)
+ */
+export function evaluateLocally(
   scenario: GatekeeperScenario,
   userResponse: string,
   presetQuality?: 'master' | 'good' | 'reactive'
@@ -72,10 +206,13 @@ export function evaluateGatekeeperResponse(
       empathy: 92,
       control: 96,
       stars: 5,
-      headline: 'Resposta de Alta Liderança!',
+      headline: 'Liderança Exemplar',
       reason:
-        'Ótima resposta! Sua escuta ativa se destacou, você assumiu protagonismo sem entrar na defensiva e ofereceu um próximo passo concreto.',
-      xpEarned: 20,
+        'Sua escuta ativa e postura calma desarmaram a pressão e direcionaram a conversa para um plano objetivo.',
+      personaReply:
+        'Agradeço pela clareza e transparência. Esse plano faz total sentido — vamos seguir assim.',
+      xpEarned: 25,
+      provider: 'Motor Local',
     };
   }
 
@@ -85,10 +222,13 @@ export function evaluateGatekeeperResponse(
       empathy: 78,
       control: 80,
       stars: 4,
-      headline: 'Boa postura profissional!',
+      headline: 'Boa Postura',
       reason:
-        'Você manteve o respeito e o controle emocional. Para chegar às 5 estrelas, traga um plano de ação com prazos ou opções mais objetivos.',
+        'Você manteve o respeito e o equilíbrio. Para alcançar 5 estrelas, proponha um próximo passo mais objetivo com prazo.',
+      personaReply:
+        'Ok, entendi o cenário. Só preciso que você me passe uma previsão concreta ainda hoje.',
       xpEarned: 20,
+      provider: 'Motor Local',
     };
   }
 
@@ -98,14 +238,16 @@ export function evaluateGatekeeperResponse(
       empathy: 32,
       control: 38,
       stars: 2,
-      headline: 'Cuidado com o tom reativo!',
+      headline: 'Tom Defensivo',
       reason:
-        'A resposta soou defensiva sob pressão. Em momentos tensos, valide o ponto do outro primeiro e conduza a conversa para soluções práticas.',
-      xpEarned: 20,
+        'A resposta soou reativa sob pressão. Valide o ponto do outro primeiro e conduza o foco para soluções práticas.',
+      personaReply:
+        'Não foi bem o alinhamento que eu esperava. Vamos retomar essa conversa com mais calma depois.',
+      xpEarned: 15,
+      provider: 'Motor Local',
     };
   }
 
-  // Free-text heuristic analysis
   const text = userResponse.toLowerCase().trim();
   const wordCount = text.split(/\s+/).filter(Boolean).length;
 
@@ -113,7 +255,6 @@ export function evaluateGatekeeperResponse(
   let empathy = 54;
   let control = 62;
 
-  // Scenario-specific ideal keywords
   scenario.idealKeywords.forEach((kw) => {
     if (text.includes(kw)) {
       clarity += 7;
@@ -121,7 +262,6 @@ export function evaluateGatekeeperResponse(
     }
   });
 
-  // General empathy & clarity signals
   EMPATHY_MARKERS.forEach((kw) => {
     if (text.includes(kw)) empathy += 9;
   });
@@ -130,7 +270,6 @@ export function evaluateGatekeeperResponse(
     if (text.includes(kw)) clarity += 7;
   });
 
-  // Penalize reactive / defensive language
   const allAvoid = [...REACTIVE_MARKERS, ...scenario.avoidKeywords];
   let reactiveHits = 0;
   allAvoid.forEach((kw) => {
@@ -141,13 +280,14 @@ export function evaluateGatekeeperResponse(
     }
   });
 
-  // All-caps or excessive exclamation marks signal impulse
-  if (text.includes('!!') || (userResponse.length > 10 && userResponse === userResponse.toUpperCase())) {
+  if (
+    text.includes('!!') ||
+    (userResponse.length > 10 && userResponse === userResponse.toUpperCase())
+  ) {
     control -= 18;
     empathy -= 10;
   }
 
-  // Reward well-articulated responses (not one-word replies)
   if (wordCount >= 14) {
     clarity += 10;
     control += 8;
@@ -156,13 +296,11 @@ export function evaluateGatekeeperResponse(
     empathy -= 10;
   }
 
-  // Questions invite dialogue
   if (text.includes('?')) {
     empathy += 8;
     clarity += 5;
   }
 
-  const clamp = (n: number) => Math.max(20, Math.min(98, Math.round(n)));
   clarity = clamp(clarity);
   empathy = clamp(empathy);
   control = clamp(control);
@@ -172,25 +310,30 @@ export function evaluateGatekeeperResponse(
 
   let headline: string;
   let reason: string;
+  let personaReply: string;
 
   if (stars === 5) {
-    headline = 'Domínio Comportamental!';
+    headline = 'Domínio Comportamental';
     reason =
-      'Excelente combinação de empatia genuína, clareza executiva e autocontrole. Nível de liderança sênior!';
+      'Excelente combinação de empatia genuína, clareza executiva e autocontrole sob pressão.';
+    personaReply = 'Excelente posicionamento. Fico bem mais tranquilo seguindo com esse plano.';
   } else if (stars === 4) {
-    headline = 'Muito boa abordagem!';
+    headline = 'Abordagem Madura';
     reason =
-      'Você conduziu o cenário com maturidade. Incluir uma pergunta aberta ou um prazo exato deixaria a resposta impecável.';
+      'Você conduziu bem o cenário. Incluir uma pergunta aberta ou prazo específico tornaria a resposta impecável.';
+    personaReply = 'Faz sentido. Me mantenha atualizado assim que avançarmos nisso.';
   } else if (stars === 3) {
-    headline = 'No caminho certo!';
+    headline = 'No Caminho Certo';
     reason =
-      'Sua intenção foi construtiva, mas vale fortalecer a validação emocional antes de apresentar sua solução.';
+      'Boa intenção construtiva, mas vale fortalecer a validação emocional antes de apresentar sua solução.';
+    personaReply = 'Entendi, mas ainda gostaria de ver mais detalhes de como vamos resolver isso.';
   } else {
-    headline = reactiveHits > 0 ? 'Atenção ao tom defensivo!' : 'Resposta muito curta!';
+    headline = reactiveHits > 0 ? 'Atenção ao Tom' : 'Resposta Muito Curta';
     reason =
       reactiveHits > 0
-        ? 'Evite termos acusatórios ou defensivos sob pressão. Respire, valide o contexto e proponha um próximo passo claro.'
-        : 'Respostas muito curtas podem soar frias em cenários de pressão. Detalhe sua compreensão e ofereça um plano objetivo.';
+        ? 'Evite termos acusatórios sob pressão. Respire, valide o contexto e proponha um próximo passo claro.'
+        : 'Respostas curtas demais podem soar frias sob pressão. Detalhe sua compreensão e traga um plano objetivo.';
+    personaReply = 'Acho que precisamos conversar melhor sobre isso para alinharmos as expectativas.';
   }
 
   return {
@@ -200,6 +343,33 @@ export function evaluateGatekeeperResponse(
     stars,
     headline,
     reason,
-    xpEarned: 20,
+    personaReply,
+    xpEarned: stars >= 4 ? 25 : 15,
+    provider: 'Motor Local',
   };
+}
+
+/**
+ * Main async evaluator: Gemini (if key set) -> Free Public LLM -> Local fallback.
+ */
+export async function evaluateGatekeeperResponseAsync(
+  scenario: GatekeeperScenario,
+  userResponse: string,
+  options?: {
+    presetQuality?: 'master' | 'good' | 'reactive';
+    userGeminiKey?: string;
+  }
+): Promise<GatekeeperEvaluation> {
+  const envKey = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)?.trim();
+  const activeGeminiKey = options?.userGeminiKey?.trim() || envKey;
+
+  if (activeGeminiKey) {
+    const geminiResult = await evaluateWithGemini(scenario, userResponse, activeGeminiKey);
+    if (geminiResult) return geminiResult;
+  }
+
+  const publicResult = await evaluateWithFreePublicAI(scenario, userResponse);
+  if (publicResult) return publicResult;
+
+  return evaluateLocally(scenario, userResponse, options?.presetQuality);
 }

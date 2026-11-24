@@ -9,17 +9,17 @@ interface NavigationBarProps {
   setActiveTab: (tab: AppTabId) => void;
 }
 
-const TABS: { id: AppTabId; label: string; icon: typeof Map; activeColor: string }[] = [
-  { id: 'trail', label: 'Trilha', icon: Map, activeColor: '#43B02A' },
-  { id: 'gatekeeper', label: 'Gatekeeper', icon: BrainCircuit, activeColor: '#7C4DFF' },
-  { id: 'league', label: 'Ligas', icon: Trophy, activeColor: '#D39E00' },
-  { id: 'evolution', label: 'Evolução', icon: BarChart3, activeColor: '#29B6F6' },
-  { id: 'profile', label: 'Perfil', icon: User, activeColor: '#FF6D00' },
+const TABS: { id: AppTabId; label: string; icon: typeof Map; activeColor: string; activeBg: string }[] = [
+  { id: 'trail', label: 'Trilha', icon: Map, activeColor: '#58CC02', activeBg: '#EEFBE5' },
+  { id: 'gatekeeper', label: 'Gatekeeper', icon: BrainCircuit, activeColor: '#6366F1', activeBg: '#EEF2FF' },
+  { id: 'league', label: 'Ligas', icon: Trophy, activeColor: '#D99B00', activeBg: '#FFFBEB' },
+  { id: 'evolution', label: 'Evolução', icon: BarChart3, activeColor: '#1CB0F6', activeBg: '#E0F5FF' },
+  { id: 'profile', label: 'Perfil', icon: User, activeColor: '#FF9600', activeBg: '#FFF5E6' },
 ];
 
 export default function NavigationBar({ activeTab, setActiveTab }: NavigationBarProps) {
   return (
-    <nav className="sticky bottom-0 left-0 right-0 z-40 bg-white border-t-[2.5px] border-[#1A1D20] px-2 pt-2 pb-2 pb-safe">
+    <nav className="sticky bottom-0 left-0 right-0 z-40 apple-glass border-t border-slate-200/80 px-2 pt-2 pb-2 pb-safe">
       <div className="flex items-center justify-between gap-1">
         {TABS.map((tab) => {
           const Icon = tab.icon;
@@ -35,25 +35,25 @@ export default function NavigationBar({ activeTab, setActiveTab }: NavigationBar
             >
               {isActive && (
                 <motion.div
-                  layoutId="evoala-nav-pill"
+                  layoutId="evoala-apple-nav-pill"
                   transition={{ type: 'spring', stiffness: 450, damping: 32 }}
-                  className="absolute inset-0 bg-[#E1F5FE] border-2 border-[#1A1D20] shadow-[0px_2px_0px_#1A1D20] rounded-2xl"
+                  style={{ backgroundColor: tab.activeBg }}
+                  className="absolute inset-0 rounded-2xl"
                 />
               )}
 
               <motion.div
-                whileTap={{ scale: 0.86 }}
+                whileTap={{ scale: 0.88 }}
                 className="relative z-10 flex flex-col items-center gap-0.5"
               >
                 <Icon
                   size={21}
-                  strokeWidth={isActive ? 2.6 : 2.1}
-                  style={{ color: isActive ? tab.activeColor : '#64748B' }}
+                  strokeWidth={isActive ? 2.5 : 2}
+                  style={{ color: isActive ? tab.activeColor : '#94A3B8' }}
                 />
                 <span
-                  className={`text-[10px] font-extrabold tracking-tight ${
-                    isActive ? 'text-[#1A1D20]' : 'text-slate-500'
-                  }`}
+                  className="text-[10px] font-bold tracking-tight transition-colors"
+                  style={{ color: isActive ? tab.activeColor : '#94A3B8' }}
                 >
                   {tab.label}
                 </span>

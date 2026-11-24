@@ -97,6 +97,7 @@ interface AppState {
   // Settings
   soundEnabled: boolean;
   isDarkMode: boolean;
+  geminiApiKey: string;
 
   // Behavioral telemetry & evolution
   metrics: BehavioralMetrics;
@@ -120,6 +121,7 @@ interface AppState {
   recordGatekeeperSession: (record: Omit<GatekeeperRecord, 'id' | 'timestamp'>) => void;
   toggleSound: () => void;
   toggleDarkMode: () => void;
+  setGeminiApiKey: (key: string) => void;
   resetProgress: () => void;
 }
 
@@ -142,6 +144,7 @@ export const useAppStore = create<AppState>()(
 
       soundEnabled: true,
       isDarkMode: false,
+      geminiApiKey: '',
 
       metrics: {
         clarity: 62,
@@ -256,6 +259,8 @@ export const useAppStore = create<AppState>()(
         }),
 
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+
+      setGeminiApiKey: (key) => set({ geminiApiKey: key.trim() }),
 
       resetProgress: () =>
         set({
