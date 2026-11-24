@@ -197,7 +197,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   if (energy === 0 && !lessonFinished) {
     const completedSteps = currentIndex;
     return (
-      <div className="fixed inset-0 z-50 bg-[#07111A] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+      <div className="fixed inset-0 z-50 bg-[#131F24] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
         <SkyBackground />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -285,7 +285,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   if (lessonFinished) {
     const accuracy = Math.round((correctCount / lesson.challenges.length) * 100);
     return (
-      <div className="fixed inset-0 z-50 bg-[#07111A] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+      <div className="fixed inset-0 z-50 bg-[#131F24] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
         <SkyBackground />
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
@@ -375,10 +375,10 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   const cheerPhrase = CHEER_PHRASES[currentIndex % CHEER_PHRASES.length];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#07111A] flex justify-center">
+    <div className="fixed inset-0 z-50 bg-[#131F24] flex justify-center">
       <SkyBackground />
       <div
-        className={`w-full max-w-[480px] h-[100dvh] bg-transparent flex flex-col relative z-10 overflow-hidden sm:border-x sm:border-white/12 ${
+        className={`w-full max-w-[480px] mx-auto h-[100dvh] bg-[#131F24] flex flex-col relative z-10 overflow-hidden ${
           shakeTrigger ? 'animate-shake' : ''
         }`}
       >

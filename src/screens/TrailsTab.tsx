@@ -17,15 +17,15 @@ interface TrailsTabProps {
   onSelectLesson: (lesson: CurriculumLesson) => void;
 }
 
-/** Gentle S-curve horizontal offsets */
-const S_CURVE_OFFSETS = [0, -34, -48, -18];
+/** Mobile-safe S-curve horizontal offsets (strictly <= ±40px so Coala never clips on 320px-390px) */
+const S_CURVE_OFFSETS = [0, -28, -40, -16];
 
-/** Vitrified Liquid Glass Unit Banner Gradients (Evoala Blue Lead Identity!) */
-const UNIT_GLASS_GRADIENTS = [
-  'linear-gradient(135deg, rgba(41, 182, 246, 0.94) 0%, rgba(2, 136, 209, 0.92) 100%)',
-  'linear-gradient(135deg, rgba(28, 176, 246, 0.9) 0%, rgba(56, 189, 248, 0.86) 100%)',
-  'linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(99, 102, 241, 0.88) 100%)',
-  'linear-gradient(135deg, rgba(124, 77, 255, 0.88) 0%, rgba(41, 182, 246, 0.86) 100%)',
+/** Solid Vibrant Duolingo-Style Unit Banners (Static Color + 3D Bottom Ledge) */
+const UNIT_SOLID_THEMES = [
+  { bg: '#1CB0F6', ledge: '#1484B8' },
+  { bg: '#00CD9C', ledge: '#009E77' },
+  { bg: '#58CC02', ledge: '#46A302' },
+  { bg: '#CE82FF', ledge: '#A55EEA' },
 ];
 
 export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
@@ -88,24 +88,23 @@ export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
 
         return (
           <section key={unit.id} id={`unit-${unit.id}`} className="mb-14">
-            {/* Vitrified Colored Liquid Glass Unit Banner */}
+            {/* Solid Bold Unit Banner with Right Guidebook Divider */}
             <div
-              className="rounded-3xl mb-12 text-white overflow-hidden flex items-stretch backdrop-blur-xl border border-white/30"
+              className="rounded-2xl mb-12 text-white overflow-hidden flex items-stretch"
               style={{
-                background: UNIT_GLASS_GRADIENTS[uIdx % UNIT_GLASS_GRADIENTS.length],
-                boxShadow:
-                  'inset 0 1.5px 1px rgba(255,255,255,0.6), 0 14px 32px -6px rgba(0,0,0,0.45)',
+                backgroundColor: UNIT_SOLID_THEMES[uIdx % UNIT_SOLID_THEMES.length].bg,
+                boxShadow: `0 4px 0 ${UNIT_SOLID_THEMES[uIdx % UNIT_SOLID_THEMES.length].ledge}`,
               }}
             >
               <div className="flex-1 px-4 py-4">
                 <span className="block text-[11px] font-extrabold tracking-wider uppercase text-white/90 mb-0.5">
                   {unit.sectionLabel}
                 </span>
-                <h2 className="font-display text-[17px] font-black leading-snug text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.2)]">
+                <h2 className="font-display text-[17px] font-black leading-snug text-white">
                   {unit.title}
                 </h2>
               </div>
-              <div className="w-14 border-l border-white/25 flex items-center justify-center shrink-0 bg-white/10">
+              <div className="w-14 border-l-2 border-black/15 flex items-center justify-center shrink-0 bg-black/5">
                 <BookOpen size={21} strokeWidth={2.4} className="text-white" />
               </div>
             </div>
@@ -149,10 +148,10 @@ export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
                         onClick={() => setPreviewLessonId(isPreviewOpen ? null : lesson.id)}
                       />
 
-                      {/* Coala Companion in Circular Liquid Glass Aura Pedestal + 3 Golden Stars */}
+                      {/* Coala Companion with Centered 3 Stars (Zero Horizontal Overflow on 320px+) */}
                       {idx === 1 && (
-                        <div className="absolute left-[112px] top-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none select-none">
-                          <div className="relative w-24 h-24 rounded-full liquid-glass flex items-center justify-center">
+                        <div className="absolute left-[104px] top-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-[92px] pointer-events-none select-none">
+                          <div className="relative w-[88px] h-[88px] rounded-full bg-[#1B2B34] border-2 border-[#2C3E47] flex items-center justify-center">
                             <CoalaMascot
                               pose={
                                 unitAllDone
@@ -161,24 +160,19 @@ export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
                                     ? 'encouraging'
                                     : 'waving'
                               }
-                              size={88}
-                              className="relative z-10 -mt-1"
+                              size={82}
+                              className="relative z-10"
                             />
                           </div>
-                          <div className="flex items-center gap-1 mt-2">
+                          <div className="flex items-center justify-center gap-1 mt-1.5 w-full">
                             {[0, 1, 2].map((starIdx) => {
                               const earned = unitCompletedCount > starIdx;
                               return (
                                 <Star
                                   key={starIdx}
                                   size={14}
-                                  fill={earned ? '#FFD54F' : 'rgba(255,255,255,0.12)'}
-                                  stroke={earned ? '#FFB300' : 'rgba(255,255,255,0.18)'}
-                                  className={
-                                    earned
-                                      ? 'drop-shadow-[0_0_6px_rgba(255,213,79,0.75)]'
-                                      : ''
-                                  }
+                                  fill={earned ? '#FFC800' : '#26353D'}
+                                  stroke={earned ? '#E5A400' : '#26353D'}
                                 />
                               );
                             })}

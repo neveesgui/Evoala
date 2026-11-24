@@ -14,21 +14,21 @@ export type TactileVariant =
 
 const VARIANT_STYLES: Record<TactileVariant, string> = {
   green:
-    'bg-gradient-to-b from-[#5EE000] to-[#4CC000] text-[#05120A] border-b-[#389400] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.55),0_8px_20px_-4px_rgba(88,204,2,0.4)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#58CC02] text-[#0D161A] border-b-[#46A302] hover:bg-[#61DA06] active:border-b-0 active:translate-y-[3px]',
   mint:
-    'bg-gradient-to-b from-[#16F0AB] to-[#00C49A] text-[#041A15] border-b-[#008C6E] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.6),0_8px_22px_-4px_rgba(16,232,162,0.45)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#10D998] text-[#071A14] border-b-[#00A676] hover:bg-[#1EE6A6] active:border-b-0 active:translate-y-[3px]',
   blue:
-    'bg-gradient-to-b from-[#38C6FF] to-[#1CA3EC] text-[#051520] border-b-[#1279B5] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.6),0_8px_22px_-4px_rgba(41,182,246,0.45)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#1CB0F6] text-[#07161F] border-b-[#148AC2] hover:bg-[#31BCFF] active:border-b-0 active:translate-y-[3px]',
   gold:
-    'bg-gradient-to-b from-[#FFE066] to-[#FFB300] text-[#1C1200] border-b-[#B27B00] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.65),0_8px_22px_-4px_rgba(255,193,7,0.4)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#FFC800] text-[#1C1200] border-b-[#CC9A00] hover:bg-[#FFD324] active:border-b-0 active:translate-y-[3px]',
   coral:
-    'bg-gradient-to-b from-[#FF6666] to-[#EB3B3B] text-white border-b-[#B81D1D] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.45),0_8px_22px_-4px_rgba(255,75,75,0.4)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#FF4B4B] text-white border-b-[#CC2929] hover:bg-[#FF6060] active:border-b-0 active:translate-y-[3px]',
   purple:
-    'bg-gradient-to-b from-[#D799FF] to-[#9B51E0] text-white border-b-[#6D28B8] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.5),0_8px_22px_-4px_rgba(155,81,224,0.4)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#CE82FF] text-[#131F24] border-b-[#A55EEA] hover:bg-[#D899FF] active:border-b-0 active:translate-y-[3px]',
   orange:
-    'bg-gradient-to-b from-[#FFB03A] to-[#FF8000] text-[#1C0F00] border-b-[#C45E00] shadow-[inset_0_1.5px_1px_rgba(255,255,255,0.55),0_8px_22px_-4px_rgba(255,150,0,0.4)] active:border-b-0 active:translate-y-[3px]',
+    'bg-[#FF9600] text-[#1C0F00] border-b-[#CC7600] hover:bg-[#FFA524] active:border-b-0 active:translate-y-[3px]',
   white:
-    'liquid-glass text-white border-b-[3px] border-b-white/25 hover:bg-white/15 active:border-b active:translate-y-[2px]',
+    'bg-[#1B2B34] text-white border-2 border-[#2F424C] border-b-4 border-b-[#101A1F] hover:bg-[#223540] active:border-b-2 active:translate-y-[2px]',
 };
 
 interface TactileButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -77,7 +77,7 @@ export function TactileButton({
         ${fullWidth ? 'w-full' : ''}
         ${
           disabled
-            ? 'bg-white/8 text-white/30 border-b-4 border-b-white/10 cursor-not-allowed shadow-none'
+            ? 'bg-[#23323A] text-[#52656D] border-b-4 border-b-[#1A262D] cursor-not-allowed'
             : VARIANT_STYLES[variant]
         }
         ${className}
@@ -113,37 +113,8 @@ export function TactileCard({
 }
 
 /**
- * Apple Liquid Glass Aurora Mesh Background:
- * Deep midnight #07111A canvas with strategic Sky Blue, Emerald, and Indigo radial orbs
- * so translucent glass panels refract vivid ambient light.
+ * Clean single solid color backdrop (#131F24) — zero aurora blobs or multi-tone gradients.
  */
 export function SkyBackground() {
-  return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden z-0 bg-[#061320]">
-      {/* Strong Signature Evoala Sky Blue top-center aura */}
-      <div
-        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[620px] h-[440px] rounded-full blur-3xl"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(41,182,246,0.38) 0%, rgba(28,163,236,0.14) 52%, transparent 76%)',
-        }}
-      />
-      {/* Evoala Blue mid-left refraction orb */}
-      <div
-        className="absolute top-[38%] -left-24 w-[400px] h-[400px] rounded-full blur-3xl"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(41,182,246,0.24) 0%, rgba(41,182,246,0.05) 60%, transparent 76%)',
-        }}
-      />
-      {/* Deep Ocean Blue + Subtle Indigo bottom-right orb */}
-      <div
-        className="absolute bottom-[-80px] -right-20 w-[440px] h-[440px] rounded-full blur-3xl"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(2,136,209,0.28) 0%, rgba(99,102,241,0.1) 58%, transparent 76%)',
-        }}
-      />
-    </div>
-  );
+  return <div className="pointer-events-none fixed inset-0 z-0 bg-[#131F24]" />;
 }

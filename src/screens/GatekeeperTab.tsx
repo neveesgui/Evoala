@@ -83,15 +83,7 @@ export function GatekeeperTab() {
   if (!activeScenario) {
     return (
       <div className="px-4 pt-5 pb-10">
-        <div
-          className="rounded-3xl p-4 text-white mb-6 relative overflow-hidden backdrop-blur-xl border border-white/25"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(124, 77, 255, 0.85) 0%, rgba(41, 182, 246, 0.78) 100%)',
-            boxShadow:
-              'inset 0 1.5px 1px rgba(255,255,255,0.55), 0 14px 32px -6px rgba(0,0,0,0.45)',
-          }}
-        >
+        <div className="rounded-2xl bg-[#7C4DFF] shadow-[0_4px_0_#5B2FD6] p-4 text-white mb-6 relative overflow-hidden">
           <div className="flex items-center gap-3.5 relative z-10">
             <CoalaMascot pose="thinking" size={82} className="shrink-0" />
             <div>

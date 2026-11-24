@@ -37,7 +37,7 @@ export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 pt-safe apple-glass border-b border-white/12 px-3 sm:px-4 py-2.5">
+    <header className="sticky top-0 z-30 pt-safe bg-[#131F24] border-b-2 border-[#23323A] px-3 sm:px-4 py-2.5">
       <div className="flex items-center justify-between gap-2">
         {/* Liquid Glass Area Pill */}
         <div className="relative min-w-0">

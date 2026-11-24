@@ -61,11 +61,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full relative flex justify-center overflow-hidden bg-[#07111A]">
+    <div className="min-h-[100dvh] w-full relative flex justify-center overflow-x-hidden bg-[#131F24]">
       <SkyBackground />
 
-      {/* Apple Liquid Glass Centered Mobile-First Frame */}
-      <div className="w-full max-w-[480px] h-[100dvh] flex flex-col relative z-10 bg-transparent sm:border-x sm:border-white/12 sm:shadow-[0_0_60px_rgba(0,0,0,0.65)]">
+      {/* Centered Mobile-First App Column on Uniform Solid #131F24 */}
+      <div className="w-full max-w-[480px] mx-auto h-[100dvh] flex flex-col relative z-10 bg-[#131F24]">
         <TopHeader onSelectUnit={handleSelectUnit} />
 
         <main

@@ -10,6 +10,7 @@ import {
 } from '../store/useAppStore';
 import { WORK_AREAS, getAreaMeta } from '../data/curriculum';
 import { CoalaMascot } from './CoalaMascot';
+import { EvoalaLogo } from './EvoalaLogo';
 import { SkyBackground, TactileButton, TactileCard } from './ui/TactileUI';
 import { soundFX } from '../utils/soundEffects';
 
@@ -417,7 +418,7 @@ export default function OnboardingScreen() {
     .filter((s): s is ChatTurnStage => s.kind === 'chat');
 
   return (
-    <div className="min-h-[100dvh] w-full relative flex items-center justify-center px-4 py-8 pt-safe pb-safe overflow-y-auto overflow-x-hidden bg-[#07111A]">
+    <div className="min-h-[100dvh] w-full relative flex items-center justify-center px-4 py-8 pt-safe pb-safe overflow-y-auto overflow-x-hidden bg-[#131F24]">
       <SkyBackground />
 
       <div className="w-full max-w-[430px] my-auto relative z-10">
@@ -432,7 +433,7 @@ export default function OnboardingScreen() {
               transition={{ type: 'spring', stiffness: 320, damping: 26 }}
               className="flex flex-col items-center"
             >
-              <CoalaMascot pose="waving" size={146} className="mb-2" />
+              <EvoalaLogo size={142} className="mb-3" />
 
               <h1 className="font-display text-4xl font-black text-white tracking-tight mb-1">
                 EVO<span className="text-[#29B6F6]">ALA</span>
