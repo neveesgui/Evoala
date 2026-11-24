@@ -1,28 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  /* Duolingo Dark Mode + Apple Minimalist Palette */
-  --color-duo-bg: #131F24;
-  --color-duo-surface: #1B2B34;
-  --color-duo-surface-hover: #223540;
-  --color-duo-border: #37464F;
-  --color-duo-border-dark: #25333B;
-
-  --color-duo-mint: #00CD9C;
-  --color-duo-mint-dark: #00A67E;
-  --color-duo-green: #58CC02;
-  --color-duo-green-dark: #46A302;
-  --color-duo-blue: #1CB0F6;
-  --color-duo-blue-dark: #1899D6;
-  --color-duo-gold: #FFC800;
-  --color-duo-gold-dark: #E5A400;
-  --color-duo-orange: #FF9600;
-  --color-duo-orange-dark: #DF7B00;
-  --color-duo-pink: #FF5E9C;
-  --color-duo-coral: #FF4B4B;
-  --color-duo-coral-dark: #EA2B2B;
-  --color-duo-purple: #CE82FF;
-  --color-duo-purple-dark: #A55EEA;
+  /* Apple Liquid Glass + Evoala Vibrant Palette */
+  --color-evoala-bg: #07111A;
+  --color-evoala-sky: #29B6F6;
+  --color-evoala-emerald: #00E676;
+  --color-evoala-mint: #10E8A2;
+  --color-evoala-teal: #00BFA5;
+  --color-evoala-gold: #FFD54F;
+  --color-evoala-amber: #FFB300;
+  --color-evoala-orange: #FF9600;
+  --color-evoala-pink: #FF5E9C;
+  --color-evoala-coral: #FF4B4B;
+  --color-evoala-purple: #CE82FF;
+  --color-evoala-indigo: #6366F1;
 
   /* Typography */
   --font-display: "Nunito", -apple-system, BlinkMacSystemFont, ui-rounded, sans-serif;
@@ -34,7 +25,7 @@
   body {
     font-family: var(--font-sans);
     color: #F1F5F9;
-    background-color: #0D161A;
+    background-color: #07111A;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
   }
@@ -47,37 +38,69 @@
   }
 }
 
-/* Duolingo Dark Mode Elevated Cards */
+/* =========================================================
+   APPLE LIQUID GLASS (iOS 26 / visionOS) DESIGN SYSTEM
+   ========================================================= */
+.liquid-glass {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 32px -4px rgba(0, 0, 0, 0.45);
+}
+
+.liquid-glass-subtle {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.32),
+    0 8px 24px -4px rgba(0, 0, 0, 0.35);
+}
+
 .tactile-card {
-  background-color: #1B2B34;
-  border: 2px solid #2E3F49;
-  box-shadow: 0px 3px 0px #101A1F;
-  border-radius: 1.375rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.07),
+    0 12px 32px -4px rgba(0, 0, 0, 0.45);
+  border-radius: 1.5rem;
 }
 
 .tactile-card-interactive {
-  background-color: #1B2B34;
-  border: 2px solid #37464F;
-  border-bottom-width: 4px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  backdrop-filter: blur(20px) saturate(175%);
+  -webkit-backdrop-filter: blur(20px) saturate(175%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.38),
+    0 10px 24px -6px rgba(0, 0, 0, 0.4);
   border-radius: 1.25rem;
-  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background-color 0.15s ease;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background 0.15s ease;
 }
 
 .tactile-card-interactive:hover {
-  background-color: #223540;
-  border-color: #4A5F6B;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.06) 100%);
+  border-color: rgba(255, 255, 255, 0.32);
 }
 
 .tactile-card-interactive:active {
   transform: translateY(2px);
-  border-bottom-width: 2px;
+  border-bottom-width: 1px;
 }
 
-/* Frosted Dark Apple Glass Surface */
 .apple-glass {
-  background: rgba(19, 31, 36, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(7, 17, 26, 0.72);
+  backdrop-filter: blur(26px) saturate(185%);
+  -webkit-backdrop-filter: blur(26px) saturate(185%);
 }
 
 /* Safe area support for Capacitor / iOS / Android */
@@ -118,13 +141,13 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0.45) 50%,
     transparent 100%
   );
   animation: sheen-slide 2.4s ease-in-out infinite;
 }
 
-/* Clean scrollbars inside mobile frame */
+/* Clean scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

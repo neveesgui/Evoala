@@ -18,13 +18,13 @@ import {
 } from 'lucide-react';
 import type {
   CurriculumLesson,
-  CnvBuilderChallenge,
+  PhraseCompleteChallenge,
   EmotionThermometerChallenge,
   MiniRoleplayChallenge,
 } from '../data/curriculum';
 import { useAppStore } from '../store/useAppStore';
 import { CoalaMascot } from './CoalaMascot';
-import { TactileButton, TactileCard } from './ui/TactileUI';
+import { SkyBackground, TactileButton, TactileCard } from './ui/TactileUI';
 import { soundFX } from '../utils/soundEffects';
 
 interface LessonPlayerProps {
@@ -34,7 +34,7 @@ interface LessonPlayerProps {
 
 const CHEER_PHRASES = ['Excelente!', 'Mandou muito bem!', 'Visão de líder!', 'Perfeito!'];
 const THERMOMETER_EMOJIS = ['😌', '🙂', '😬', '😰', '🌋'];
-const THERMOMETER_COLORS = ['#1CB0F6', '#00CD9C', '#FFC800', '#FF9600', '#FF4B4B'];
+const THERMOMETER_COLORS = ['#29B6F6', '#00E676', '#FFD54F', '#FF9600', '#FF4B4B'];
 
 function AnimatedXpCounter({ target }: { target: number }) {
   const [display, setDisplay] = useState(0);
@@ -75,28 +75,20 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   const [xpPopId, setXpPopId] = useState<number | null>(null);
   const [energyPopId, setEnergyPopId] = useState<number | null>(null);
 
+  // Format 1 (dilemma) & Format 2 (phrase_complete)
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
+  // Format 3 (emotion_thermometer)
   const [thermoValue, setThermoValue] = useState<number>(2);
-  const [roleplayTurn, setRoleplayTurn] = useState<0 | 1>(0);
+  // Format 4 (mini_roleplay)
+  const [roleplayTurn, setRoleplayTurn] = useState<number>(0);
   const [roleplayChoices, setRoleplayChoices] = useState<
     { text: string; isIdeal: boolean; feedback: string }[]
   >([]);
 
   const challenge = lesson.challenges[currentIndex];
 
-  const cnvPool = useMemo(() => {
-    if (!challenge || challenge.type !== 'cnv_builder') return [];
-    const all = [...challenge.correctOrder, ...(challenge.distractors || [])];
-    return all
-      .map((text, idx) => ({ text, sortKey: (idx * 7 + text.length * 3) % 11 }))
-      .sort((a, b) => a.sortKey - b.sortKey)
-      .map((item) => item.text);
-  }, [challenge]);
-
   const resetChallengeState = () => {
     setSelectedOption(null);
-    setSelectedBlocks([]);
     setThermoValue(2);
     setRoleplayTurn(0);
     setRoleplayChoices([]);
@@ -108,32 +100,29 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
     if (!challenge) return false;
     switch (challenge.type) {
       case 'dilemma':
+      case 'phrase_complete':
         return selectedOption !== null;
-      case 'cnv_builder':
-        return selectedBlocks.length === challenge.correctOrder.length;
       case 'emotion_thermometer':
         return true;
       case 'mini_roleplay':
-        return roleplayChoices.length === 2;
+        return roleplayChoices.length === challenge.turns.length;
       default:
         return false;
     }
-  }, [challenge, selectedOption, selectedBlocks, roleplayChoices]);
+  }, [challenge, selectedOption, roleplayChoices]);
 
   const evaluateAnswer = (): boolean => {
     if (!challenge) return false;
     switch (challenge.type) {
       case 'dilemma':
+      case 'phrase_complete':
         return selectedOption === challenge.correctIndex;
-      case 'cnv_builder':
-        return (
-          selectedBlocks.length === challenge.correctOrder.length &&
-          selectedBlocks.every((blk, idx) => blk === challenge.correctOrder[idx])
-        );
       case 'emotion_thermometer':
         return thermoValue >= challenge.idealRange[0] && thermoValue <= challenge.idealRange[1];
-      case 'mini_roleplay':
-        return roleplayChoices.filter((c) => c.isIdeal).length >= 1 && roleplayChoices[1]?.isIdeal;
+      case 'mini_roleplay': {
+        const idealCount = roleplayChoices.filter((c) => c.isIdeal).length;
+        return idealCount >= Math.ceil(challenge.turns.length / 2) && Boolean(roleplayChoices[roleplayChoices.length - 1]?.isIdeal);
+      }
       default:
         return false;
     }
@@ -158,7 +147,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
           particleCount: 24,
           spread: 48,
           origin: { y: 0.78 },
-          colors: ['#00CD9C', '#58CC02', '#FFC800', '#1CB0F6'],
+          colors: ['#10E8A2', '#00E676', '#FFD54F', '#29B6F6'],
         });
       }
     } else {
@@ -186,34 +175,21 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
         particleCount: 95,
         spread: 78,
         origin: { y: 0.55 },
-        colors: ['#00CD9C', '#58CC02', '#FFC800', '#1CB0F6', '#CE82FF'],
+        colors: ['#10E8A2', '#00E676', '#FFD54F', '#29B6F6', '#CE82FF'],
       });
     }
   };
 
-  const handleToggleCnvBlock = (block: string) => {
-    if (isChecked) return;
-    soundFX.playSelect();
-    if (selectedBlocks.includes(block)) {
-      setSelectedBlocks((prev) => prev.filter((b) => b !== block));
-    } else {
-      const cnv = challenge as CnvBuilderChallenge;
-      if (selectedBlocks.length < cnv.correctOrder.length) {
-        setSelectedBlocks((prev) => [...prev, block]);
-      }
-    }
-  };
-
   const handleRoleplayPick = (option: { text: string; isIdeal: boolean; feedback: string }) => {
-    if (isChecked) return;
+    if (isChecked || challenge.type !== 'mini_roleplay') return;
     if (option.isIdeal) soundFX.playSelect();
     else soundFX.playTap();
 
     const nextChoices = [...roleplayChoices, option];
     setRoleplayChoices(nextChoices);
 
-    if (roleplayTurn === 0) {
-      setTimeout(() => setRoleplayTurn(1), 220);
+    if (roleplayTurn < challenge.turns.length - 1) {
+      setTimeout(() => setRoleplayTurn((t) => t + 1), 240);
     }
   };
 
@@ -221,12 +197,13 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   if (energy === 0 && !lessonFinished) {
     const completedSteps = currentIndex;
     return (
-      <div className="fixed inset-0 z-50 bg-[#131F24] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+      <div className="fixed inset-0 z-50 bg-[#07111A] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+        <SkyBackground />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-          className="w-full max-w-[400px] my-auto flex flex-col items-center text-center"
+          className="w-full max-w-[400px] my-auto flex flex-col items-center text-center relative z-10"
         >
           <div className="relative mb-3">
             <motion.div
@@ -234,12 +211,12 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               transition={{ duration: 2.2, repeat: Infinity }}
               className="absolute inset-0 bg-[#FF4B4B]/25 rounded-full blur-2xl"
             />
-            <CoalaMascot mood="sad" size={148} className="relative z-10" />
+            <CoalaMascot pose="sad" size={148} className="relative z-10" />
             <motion.div
               initial={{ scale: 0, y: -10 }}
               animate={{ scale: 1, y: 0 }}
               transition={{ delay: 0.25, type: 'spring', stiffness: 360 }}
-              className="absolute -top-1 -right-2 w-11 h-11 rounded-2xl bg-[#2A1C21] border-2 border-[#FF4B4B]/50 flex items-center justify-center z-20"
+              className="absolute -top-1 -right-2 w-11 h-11 rounded-2xl liquid-glass border-[#FF4B4B]/40 flex items-center justify-center z-20"
             >
               <HeartCrack size={22} className="text-[#FF4B4B]" />
             </motion.div>
@@ -248,7 +225,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
           <h2 className="font-display text-2xl font-black text-white mb-1.5">
             Energia esgotada por agora
           </h2>
-          <p className="text-sm font-medium text-slate-400 mb-6 leading-relaxed max-w-[310px]">
+          <p className="text-sm font-medium text-slate-300 mb-6 leading-relaxed max-w-[310px]">
             Errar faz parte do treino emocional. Respire fundo — sua ofensiva está protegida e você
             pode retomar de onde parou!
           </p>
@@ -258,10 +235,10 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18 }}
-              className="bg-[#1B2B34] border-2 border-[#FF4B4B]/40 rounded-2xl p-3.5"
+              className="liquid-glass rounded-2xl p-3.5"
             >
               <HeartCrack size={18} className="text-[#FF4B4B] mx-auto mb-1" />
-              <span className="block font-display text-lg font-black text-[#FF4B4B]">0 XP</span>
+              <span className="block font-display text-lg font-black text-[#FF5E5E]">0 XP</span>
               <span className="text-[10px] font-bold uppercase text-slate-400">
                 {completedSteps}/{lesson.challenges.length} etapas
               </span>
@@ -271,10 +248,10 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28 }}
-              className="bg-[#1B2B34] border-2 border-[#00CD9C]/40 rounded-2xl p-3.5"
+              className="liquid-glass rounded-2xl p-3.5"
             >
-              <ShieldCheck size={18} className="text-[#00CD9C] mx-auto mb-1" />
-              <span className="block font-display text-lg font-black text-[#00CD9C]">
+              <ShieldCheck size={18} className="text-[#10E8A2] mx-auto mb-1" />
+              <span className="block font-display text-lg font-black text-[#10E8A2]">
                 {streak}d
               </span>
               <span className="text-[10px] font-bold uppercase text-slate-400">
@@ -308,31 +285,32 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   if (lessonFinished) {
     const accuracy = Math.round((correctCount / lesson.challenges.length) * 100);
     return (
-      <div className="fixed inset-0 z-50 bg-[#131F24] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+      <div className="fixed inset-0 z-50 bg-[#07111A] flex items-center justify-center px-5 py-8 pt-safe pb-safe overflow-y-auto">
+        <SkyBackground />
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-          className="w-full max-w-[400px] my-auto flex flex-col items-center text-center"
+          className="w-full max-w-[400px] my-auto flex flex-col items-center text-center relative z-10"
         >
           <div className="relative mb-2">
             <motion.div
-              animate={{ scale: [1, 1.18, 1], opacity: [0.4, 0.18, 0.4] }}
+              animate={{ scale: [1, 1.18, 1], opacity: [0.45, 0.2, 0.45] }}
               transition={{ duration: 2.2, repeat: Infinity }}
-              className="absolute inset-0 bg-[#FFC800]/30 rounded-full blur-2xl"
+              className="absolute inset-0 bg-[#FFD54F]/30 rounded-full blur-2xl"
             />
-            <CoalaMascot mood="celebrating" size={160} className="relative z-10" />
+            <CoalaMascot pose="celebrating" size={160} className="relative z-10" />
           </div>
 
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 }}
-            className="font-display text-3xl font-black text-[#FFC800] mb-1"
+            className="font-display text-3xl font-black text-[#FFD54F] mb-1 drop-shadow-[0_0_16px_rgba(255,213,79,0.45)]"
           >
             Lição Concluída!
           </motion.h2>
-          <p className="text-sm font-semibold text-slate-400 mb-6">
+          <p className="text-sm font-semibold text-slate-300 mb-6">
             {lesson.title} dominada com excelência
           </p>
 
@@ -341,16 +319,14 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, y: 18, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 360 }}
-              className="bg-[#FFC800] p-[2px] rounded-2xl shadow-[0_4px_0_#CC9600]"
+              className="liquid-glass rounded-2xl py-3.5 px-2 flex flex-col items-center justify-center border-[#FFD54F]/40"
             >
-              <div className="bg-[#1B2B34] rounded-[14px] py-3 px-2 h-full flex flex-col items-center justify-center">
-                <span className="text-[10px] font-extrabold uppercase text-[#FFC800] mb-1">
-                  Total XP
-                </span>
-                <div className="flex items-center gap-1 font-display text-xl font-black text-[#FFC800]">
-                  <Sparkles size={15} fill="#FFC800" />
-                  <AnimatedXpCounter target={lesson.xpReward} />
-                </div>
+              <span className="text-[10px] font-extrabold uppercase text-[#FFD54F] mb-1">
+                Total XP
+              </span>
+              <div className="flex items-center gap-1 font-display text-xl font-black text-[#FFD54F]">
+                <Sparkles size={15} fill="#FFD54F" />
+                <AnimatedXpCounter target={lesson.xpReward} />
               </div>
             </motion.div>
 
@@ -358,16 +334,14 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, y: 18, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 0.32, type: 'spring', stiffness: 360 }}
-              className="bg-[#00CD9C] p-[2px] rounded-2xl shadow-[0_4px_0_#00A67E]"
+              className="liquid-glass rounded-2xl py-3.5 px-2 flex flex-col items-center justify-center border-[#10E8A2]/40"
             >
-              <div className="bg-[#1B2B34] rounded-[14px] py-3 px-2 h-full flex flex-col items-center justify-center">
-                <span className="text-[10px] font-extrabold uppercase text-[#00CD9C] mb-1">
-                  Precisão
-                </span>
-                <div className="flex items-center gap-1 font-display text-xl font-black text-[#00CD9C]">
-                  <Target size={15} />
-                  {accuracy}%
-                </div>
+              <span className="text-[10px] font-extrabold uppercase text-[#10E8A2] mb-1">
+                Precisão
+              </span>
+              <div className="flex items-center gap-1 font-display text-xl font-black text-[#10E8A2]">
+                <Target size={15} />
+                {accuracy}%
               </div>
             </motion.div>
 
@@ -375,16 +349,14 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, y: 18, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: 0.44, type: 'spring', stiffness: 360 }}
-              className="bg-[#FF9600] p-[2px] rounded-2xl shadow-[0_4px_0_#DF7B00]"
+              className="liquid-glass rounded-2xl py-3.5 px-2 flex flex-col items-center justify-center border-[#FF9600]/40"
             >
-              <div className="bg-[#1B2B34] rounded-[14px] py-3 px-2 h-full flex flex-col items-center justify-center">
-                <span className="text-[10px] font-extrabold uppercase text-[#FF9600] mb-1">
-                  Ofensiva
-                </span>
-                <div className="flex items-center gap-1 font-display text-xl font-black text-[#FF9600]">
-                  <Flame size={15} fill="#FF9600" />
-                  {streak}d
-                </div>
+              <span className="text-[10px] font-extrabold uppercase text-[#FF9600] mb-1">
+                Ofensiva
+              </span>
+              <div className="flex items-center gap-1 font-display text-xl font-black text-[#FF9600]">
+                <Flame size={15} fill="#FF9600" />
+                {streak}d
               </div>
             </motion.div>
           </div>
@@ -403,46 +375,44 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   const cheerPhrase = CHEER_PHRASES[currentIndex % CHEER_PHRASES.length];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0D161A]/95 flex justify-center">
+    <div className="fixed inset-0 z-50 bg-[#07111A] flex justify-center">
+      <SkyBackground />
       <div
-        className={`w-full max-w-[480px] h-[100dvh] bg-[#131F24] flex flex-col relative overflow-hidden sm:border-x sm:border-[#24333B] ${
+        className={`w-full max-w-[480px] h-[100dvh] bg-transparent flex flex-col relative z-10 overflow-hidden sm:border-x sm:border-white/12 ${
           shakeTrigger ? 'animate-shake' : ''
         }`}
       >
         {/* Top Progress Header */}
-        <div className="pt-safe px-4 py-3.5 bg-[#131F24] flex items-center gap-3.5 shrink-0 relative">
+        <div className="pt-safe px-4 py-3.5 apple-glass border-b border-white/10 flex items-center gap-3.5 shrink-0 relative">
           <button
             onClick={() => {
               soundFX.playTap();
               onClose();
             }}
-            className="w-9 h-9 rounded-full hover:bg-[#1B2B34] text-slate-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors shrink-0"
+            className="w-9 h-9 rounded-full hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors shrink-0"
             aria-label="Fechar lição"
           >
             <X size={22} strokeWidth={2.6} />
           </button>
 
-          <div className="flex-1 h-4 bg-[#26353D] rounded-full overflow-hidden relative">
+          <div className="flex-1 h-4 bg-white/10 rounded-full overflow-hidden relative">
             <motion.div
-              className="h-full bg-[#00CD9C] rounded-full relative progress-sheen"
+              className="h-full bg-gradient-to-r from-[#29B6F6] to-[#00E676] rounded-full relative progress-sheen"
               initial={false}
               animate={{ width: `${Math.max(8, progressPercent)}%` }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
             />
           </div>
 
-          {/* Energy counter */}
           <div className="relative flex items-center gap-1.5 shrink-0">
             <motion.div
               key={energy}
               animate={{ scale: [1, 1.25, 1] }}
               transition={{ duration: 0.3 }}
-              className="flex items-center gap-1 text-[#FF5E9C]"
+              className="liquid-glass rounded-full px-2.5 py-1 flex items-center gap-1 text-[#FF5E9C]"
             >
-              <span className="inline-flex items-center justify-center w-6 h-4 rounded-[5px] bg-[#FF5E9C] text-white">
-                <Zap size={11} fill="#FFFFFF" strokeWidth={2.5} />
-              </span>
-              <span className="font-display font-extrabold text-sm">{energy}</span>
+              <Zap size={14} fill="#FF5E9C" strokeWidth={2.2} />
+              <span className="font-display font-extrabold text-xs">{energy}</span>
             </motion.div>
 
             <AnimatePresence>
@@ -461,7 +431,6 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
             </AnimatePresence>
           </div>
 
-          {/* Floating +15 XP reward pill */}
           <AnimatePresence>
             {xpPopId && (
               <motion.div
@@ -470,7 +439,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 animate={{ opacity: 1, y: -6, scale: 1 }}
                 exit={{ opacity: 0, y: -24 }}
                 transition={{ duration: 0.7 }}
-                className="absolute left-1/2 -translate-x-1/2 top-14 bg-[#FFC800] text-[#131F24] font-display text-xs font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1 pointer-events-none z-40"
+                className="absolute left-1/2 -translate-x-1/2 top-14 bg-[#FFD54F] text-[#1C1200] font-display text-xs font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1 pointer-events-none z-40"
               >
                 <Sparkles size={12} /> +15 XP
               </motion.div>
@@ -485,9 +454,9 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="px-4 pb-1 flex justify-center"
+              className="px-4 pt-2 flex justify-center"
             >
-              <span className="inline-flex items-center gap-1.5 bg-[#FF9600]/15 text-[#FF9600] font-display text-xs font-extrabold px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 liquid-glass text-[#FF9600] font-display text-xs font-extrabold px-3 py-1 rounded-full">
                 <Flame size={14} fill="#FF9600" /> {combo} em seguida!
               </span>
             </motion.div>
@@ -508,9 +477,9 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
               {challenge.type === 'dilemma' && (
                 <div>
                   <div className="flex items-center gap-3 mb-5">
-                    <CoalaMascot mood="happy" size={70} className="shrink-0" />
-                    <div className="bg-[#1B2B34] border-2 border-[#2E3F49] rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
-                      <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#00CD9C] mb-1">
+                    <CoalaMascot pose="thinking" size={70} className="shrink-0" />
+                    <div className="liquid-glass rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
+                      <span className="block text-[10px] font-extrabold uppercase tracking-wider text-[#10E8A2] mb-1">
                         {challenge.contextBadge}
                       </span>
                       <h2 className="font-display text-[17px] font-extrabold text-white leading-snug">
@@ -523,22 +492,22 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                     {challenge.options.map((opt, idx) => {
                       const isSelected = selectedOption === idx;
                       let stateStyle =
-                        'bg-[#1B2B34] border-2 border-[#37464F] border-b-4 border-b-[#25333B] text-slate-100 hover:bg-[#223540]';
+                        'tactile-card-interactive text-slate-100';
 
                       if (isChecked) {
                         if (idx === challenge.correctIndex) {
                           stateStyle =
-                            'bg-[#00CD9C]/15 border-2 border-[#00CD9C] border-b-4 border-b-[#00A67E] text-[#66F2CF]';
+                            'bg-[#00E676]/15 border-2 border-[#00E676] text-[#80FFBC]';
                         } else if (isSelected) {
                           stateStyle =
-                            'bg-[#FF4B4B]/15 border-2 border-[#FF4B4B] border-b-4 border-b-[#EA2B2B] text-[#FF8A8A]';
+                            'bg-[#FF4B4B]/15 border-2 border-[#FF4B4B] text-[#FF8A8A]';
                         } else {
                           stateStyle =
-                            'bg-[#16232A] border-2 border-[#25333B] text-slate-500 opacity-50';
+                            'bg-white/5 border border-white/10 text-slate-500 opacity-45';
                         }
                       } else if (isSelected) {
                         stateStyle =
-                          'bg-[#1CB0F6]/15 border-2 border-[#1CB0F6] border-b-4 border-b-[#1899D6] text-[#7DD6FF]';
+                          'bg-[#29B6F6]/20 border-2 border-[#29B6F6] shadow-[0_0_20px_rgba(41,182,246,0.25)] text-white';
                       }
 
                       return (
@@ -563,61 +532,19 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 </div>
               )}
 
-              {/* FORMAT 2: CNV WORD BANK BUILDER */}
-              {challenge.type === 'cnv_builder' && (
-                <div>
-                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#CE82FF] mb-1.5">
-                    Monte a resposta assertiva
-                  </span>
-                  <h2 className="font-display text-lg font-extrabold text-white leading-snug mb-1.5">
-                    {challenge.prompt}
-                  </h2>
-                  <p className="text-xs font-medium text-slate-400 mb-5">{challenge.situation}</p>
-
-                  <div className="min-h-[124px] bg-[#1B2B34] border-2 border-dashed border-[#37464F] rounded-2xl p-3.5 mb-5 flex flex-wrap gap-2 content-start">
-                    {selectedBlocks.length === 0 ? (
-                      <span className="text-xs font-semibold text-slate-500 m-auto">
-                        Toque nos blocos abaixo na ordem correta
-                      </span>
-                    ) : (
-                      selectedBlocks.map((block) => (
-                        <motion.button
-                          layout
-                          key={`chosen-${block}`}
-                          initial={{ scale: 0.88, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          disabled={isChecked}
-                          onClick={() => handleToggleCnvBlock(block)}
-                          className="bg-[#1CB0F6]/20 border-2 border-[#1CB0F6] border-b-4 border-b-[#1899D6] px-3.5 py-2 rounded-xl text-xs font-bold text-[#7DD6FF] cursor-pointer text-left"
-                        >
-                          {block}
-                        </motion.button>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2.5">
-                    {cnvPool.map((block) => {
-                      const isUsed = selectedBlocks.includes(block);
-                      return (
-                        <motion.button
-                          layout
-                          key={`pool-${block}`}
-                          whileTap={isUsed || isChecked ? undefined : { y: 2 }}
-                          disabled={isUsed || isChecked}
-                          onClick={() => handleToggleCnvBlock(block)}
-                          className={`px-3.5 py-2.5 rounded-xl border-2 text-xs font-bold text-left transition-all ${
-                            isUsed
-                              ? 'bg-[#18252C] border-[#24333B] text-transparent select-none cursor-default'
-                              : 'bg-[#1B2B34] border-[#37464F] border-b-4 border-b-[#25333B] text-slate-100 hover:bg-[#223540] cursor-pointer'
-                          }`}
-                        >
-                          {block}
-                        </motion.button>
-                      );
-                    })}
-                  </div>
-                </div>
+              {/* FORMAT 2: COMPLETE A RESPOSTA (Intuitive Fill-in-the-Blank Speech Bubble) */}
+              {challenge.type === 'phrase_complete' && (
+                <PhraseCompleteView
+                  challenge={challenge}
+                  selectedOption={selectedOption}
+                  isChecked={isChecked}
+                  onSelect={(idx) => {
+                    if (!isChecked) {
+                      soundFX.playSelect();
+                      setSelectedOption(idx);
+                    }
+                  }}
+                />
               )}
 
               {/* FORMAT 3: EMOTION THERMOMETER */}
@@ -635,7 +562,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 />
               )}
 
-              {/* FORMAT 4: MINI-ROLEPLAY */}
+              {/* FORMAT 4: MINI BATE-PAPO */}
               {challenge.type === 'mini_roleplay' && (
                 <MiniRoleplayView
                   challenge={challenge}
@@ -658,7 +585,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
-                className="bg-[#131F24] border-t border-[#26353D] p-4 pb-safe"
+                className="apple-glass border-t border-white/12 p-4 pb-safe"
               >
                 <TactileButton
                   variant="mint"
@@ -677,22 +604,30 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 animate={{ y: 0 }}
                 exit={{ y: 120 }}
                 transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-                className={`p-5 pb-safe border-t-2 ${
+                className={`p-5 pb-safe border-t backdrop-blur-2xl ${
                   isCorrect
-                    ? 'bg-[#142D28] border-[#00CD9C]/50'
-                    : 'bg-[#2E1A1F] border-[#FF4B4B]/50'
+                    ? 'bg-[#092820]/92 border-[#00E676]/40'
+                    : 'bg-[#2C1217]/92 border-[#FF4B4B]/40'
                 }`}
               >
                 <div className="flex items-start gap-3 mb-4">
                   <CoalaMascot
-                    mood={isCorrect ? 'celebrating' : 'sad'}
-                    size={62}
+                    pose={
+                      isCorrect
+                        ? combo >= 2
+                          ? 'thumbsUp'
+                          : 'idea'
+                        : energy <= 1
+                          ? 'sad'
+                          : 'confused'
+                    }
+                    size={64}
                     className="shrink-0 -mt-1"
                   />
                   <div className="flex-1 min-w-0">
                     <h3
                       className={`font-display text-lg font-black flex items-center gap-1.5 ${
-                        isCorrect ? 'text-[#00CD9C]' : 'text-[#FF5E5E]'
+                        isCorrect ? 'text-[#10E8A2]' : 'text-[#FF5E5E]'
                       }`}
                     >
                       {isCorrect ? (
@@ -732,6 +667,98 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
   );
 }
 
+/* FORMAT 2: INTUITIVE COMPLETE-THE-RESPONSE SPEECH BUBBLE */
+function PhraseCompleteView({
+  challenge,
+  selectedOption,
+  isChecked,
+  onSelect,
+}: {
+  challenge: PhraseCompleteChallenge;
+  selectedOption: number | null;
+  isChecked: boolean;
+  onSelect: (idx: number) => void;
+}) {
+  const chosenText = selectedOption !== null ? challenge.options[selectedOption] : null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <CoalaMascot pose="idea" size={64} className="shrink-0" />
+        <div>
+          <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#29B6F6] mb-0.5">
+            Complete a Resposta • {challenge.contextBadge}
+          </span>
+          <p className="text-xs font-semibold text-slate-300 leading-snug">
+            {challenge.situation}
+          </p>
+        </div>
+      </div>
+
+      {/* Interactive Liquid Glass Speech Bubble with Live Blank Slot */}
+      <TactileCard className="p-5 mb-5">
+        <p className="text-[10px] font-extrabold uppercase tracking-wider text-white/45 mb-2">
+          Sua resposta ideal:
+        </p>
+        <p className="font-display text-base font-bold text-white leading-relaxed">
+          "{challenge.prefix}{' '}
+          <motion.span
+            key={chosenText || 'empty'}
+            initial={{ scale: 0.92, opacity: 0.6 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className={`inline-block px-2.5 py-0.5 mx-0.5 rounded-xl border transition-colors ${
+              chosenText
+                ? isChecked
+                  ? selectedOption === challenge.correctIndex
+                    ? 'bg-[#00E676]/20 border-[#00E676] text-[#80FFBC]'
+                    : 'bg-[#FF4B4B]/20 border-[#FF4B4B] text-[#FF8A8A]'
+                  : 'bg-[#29B6F6]/25 border-[#29B6F6] text-[#8EE0FF]'
+                : 'bg-white/8 border-dashed border-white/35 text-white/45'
+            }`}
+          >
+            {chosenText || 'escolha abaixo'}
+          </motion.span>{' '}
+          {challenge.suffix}"
+        </p>
+      </TactileCard>
+
+      {/* Crisp Selectable Phrase Cards */}
+      <div className="flex flex-col gap-3">
+        {challenge.options.map((opt, idx) => {
+          const isSelected = selectedOption === idx;
+          let stateStyle = 'tactile-card-interactive text-slate-100';
+
+          if (isChecked) {
+            if (idx === challenge.correctIndex) {
+              stateStyle = 'bg-[#00E676]/15 border-2 border-[#00E676] text-[#80FFBC]';
+            } else if (isSelected) {
+              stateStyle = 'bg-[#FF4B4B]/15 border-2 border-[#FF4B4B] text-[#FF8A8A]';
+            } else {
+              stateStyle = 'bg-white/5 border border-white/10 text-slate-500 opacity-45';
+            }
+          } else if (isSelected) {
+            stateStyle =
+              'bg-[#29B6F6]/20 border-2 border-[#29B6F6] shadow-[0_0_18px_rgba(41,182,246,0.25)] text-white';
+          }
+
+          return (
+            <motion.button
+              key={idx}
+              whileTap={isChecked ? undefined : { y: 2 }}
+              disabled={isChecked}
+              onClick={() => onSelect(idx)}
+              className={`w-full text-left p-4 rounded-2xl font-semibold text-sm leading-snug transition-all cursor-pointer ${stateStyle}`}
+            >
+              "{opt}"
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* FORMAT 3: EMOTION THERMOMETER */
 function EmotionThermometerView({
   challenge,
   value,
@@ -752,17 +779,22 @@ function EmotionThermometerView({
 
   return (
     <div>
-      <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#FF9600] mb-1.5">
-        Termômetro de Emoção
-      </span>
-      <h2 className="font-display text-lg font-extrabold text-white leading-snug mb-4">
-        {challenge.prompt}
-      </h2>
+      <div className="flex items-center gap-3 mb-4">
+        <CoalaMascot pose="listening" size={64} className="shrink-0" />
+        <div>
+          <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#FF9600] mb-0.5">
+            Termômetro de Emoção
+          </span>
+          <h2 className="font-display text-base font-extrabold text-white leading-snug">
+            {challenge.prompt}
+          </h2>
+        </div>
+      </div>
 
       <TactileCard className="p-4 mb-5">
-        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-[#2A3942]">
+        <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[#1CB0F6] flex items-center justify-center font-display font-extrabold text-[#131F24] text-xs">
+            <div className="w-9 h-9 rounded-full bg-[#29B6F6] flex items-center justify-center font-display font-extrabold text-[#07111A] text-xs">
               {challenge.messageSender.slice(0, 2).toUpperCase()}
             </div>
             <div>
@@ -772,11 +804,11 @@ function EmotionThermometerView({
               <p className="text-[11px] font-medium text-slate-400">{challenge.messageRole}</p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 bg-[#131F24] px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-300">
+          <span className="inline-flex items-center gap-1 bg-white/8 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-slate-300">
             <ChannelIcon size={11} /> {challenge.messageChannel}
           </span>
         </div>
-        <p className="text-sm font-medium text-slate-200 leading-relaxed italic">
+        <p className="text-sm font-medium text-slate-100 leading-relaxed italic">
           "{challenge.messageBody}"
         </p>
       </TactileCard>
@@ -793,7 +825,7 @@ function EmotionThermometerView({
             {THERMOMETER_EMOJIS[value]}
           </motion.div>
           <span
-            className="inline-block font-display text-sm font-black px-4 py-1 rounded-full text-[#131F24]"
+            className="inline-block font-display text-sm font-black px-4 py-1 rounded-full text-[#07111A]"
             style={{ backgroundColor: THERMOMETER_COLORS[value] }}
           >
             {challenge.scaleLabels[value]}
@@ -808,7 +840,7 @@ function EmotionThermometerView({
           disabled={isChecked}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-full accent-[#00CD9C] h-2.5 rounded-lg cursor-pointer mb-3.5"
+          className="w-full accent-[#10E8A2] h-2.5 rounded-lg cursor-pointer mb-3.5"
         />
 
         <div className="grid grid-cols-5 gap-1">
@@ -819,8 +851,8 @@ function EmotionThermometerView({
               onClick={() => onChange(idx)}
               className={`py-1.5 px-1 min-h-[36px] flex items-center justify-center rounded-xl text-[9px] sm:text-[10px] font-bold text-center leading-tight break-words transition-all cursor-pointer ${
                 value === idx
-                  ? 'bg-[#00CD9C] text-[#131F24]'
-                  : 'bg-[#131F24] text-slate-400 hover:text-white'
+                  ? 'bg-[#10E8A2] text-[#07111A]'
+                  : 'bg-white/8 text-slate-300 hover:bg-white/15'
               }`}
             >
               {label}
@@ -832,6 +864,7 @@ function EmotionThermometerView({
   );
 }
 
+/* FORMAT 4: MINI BATE-PAPO REAL (Multi-turn Liquid Glass Chat) */
 function MiniRoleplayView({
   challenge,
   currentTurn,
@@ -840,98 +873,87 @@ function MiniRoleplayView({
   isChecked,
 }: {
   challenge: MiniRoleplayChallenge;
-  currentTurn: 0 | 1;
+  currentTurn: number;
   choices: { text: string; isIdeal: boolean; feedback: string }[];
   onPick: (opt: { text: string; isIdeal: boolean; feedback: string }) => void;
   isChecked: boolean;
 }) {
   const activeTurnData = challenge.turns[currentTurn];
-  const needsPick = choices.length === currentTurn;
+  const needsPick = choices.length === currentTurn && Boolean(activeTurnData);
 
   return (
     <div>
-      <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#00CD9C] mb-1.5">
-        Mini-Roleplay • 2 Turnos
-      </span>
-      <h2 className="font-display text-lg font-extrabold text-white leading-snug mb-4">
-        {challenge.prompt}
-      </h2>
-
-      <div className="space-y-3 mb-5">
-        <div className="flex items-start gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-[#CE82FF] text-[#131F24] font-display font-black text-xs flex items-center justify-center shrink-0">
-            {challenge.personaInitials}
-          </div>
-          <div className="bg-[#1B2B34] border border-[#2E3F49] rounded-2xl rounded-tl-sm p-3.5 max-w-[85%]">
-            <p className="text-[10px] font-bold text-[#CE82FF] uppercase mb-0.5">
-              {challenge.personaName} • {challenge.personaRole}
-            </p>
-            <p className="text-sm font-medium text-slate-100 leading-snug">
-              {challenge.turns[0].incoming}
-            </p>
-          </div>
+      <div className="flex items-center gap-3 mb-3">
+        <CoalaMascot pose="listening" size={64} className="shrink-0" />
+        <div>
+          <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#10E8A2] mb-0.5">
+            Mini Bate-Papo Real • {challenge.turns.length} Turnos
+          </span>
+          <h2 className="font-display text-base font-extrabold text-white leading-snug">
+            {challenge.prompt}
+          </h2>
         </div>
-
-        {choices[0] && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-end gap-1"
-          >
-            <div className="bg-[#1CB0F6] rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-[#131F24] text-sm font-bold">
-              {choices[0].text}
-            </div>
-            <span
-              className={`text-[11px] font-bold px-2 ${
-                choices[0].isIdeal ? 'text-[#00CD9C]' : 'text-[#FF5E5E]'
-              }`}
-            >
-              {choices[0].feedback}
-            </span>
-          </motion.div>
-        )}
-
-        {currentTurn === 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-start gap-2.5"
-          >
-            <div className="w-9 h-9 rounded-full bg-[#CE82FF] text-[#131F24] font-display font-black text-xs flex items-center justify-center shrink-0">
-              {challenge.personaInitials}
-            </div>
-            <div className="bg-[#1B2B34] border border-[#2E3F49] rounded-2xl rounded-tl-sm p-3.5 max-w-[85%]">
-              <p className="text-sm font-medium text-slate-100 leading-snug">
-                {challenge.turns[1].incoming}
-              </p>
-            </div>
-          </motion.div>
-        )}
-
-        {choices[1] && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-end gap-1"
-          >
-            <div className="bg-[#1CB0F6] rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-[#131F24] text-sm font-bold">
-              {choices[1].text}
-            </div>
-            <span
-              className={`text-[11px] font-bold px-2 ${
-                choices[1].isIdeal ? 'text-[#00CD9C]' : 'text-[#FF5E5E]'
-              }`}
-            >
-              {choices[1].feedback}
-            </span>
-          </motion.div>
-        )}
       </div>
 
+      {challenge.contextNote && (
+        <div className="liquid-glass-subtle rounded-xl px-3.5 py-2 mb-4 text-[11px] font-medium text-sky-200/90">
+          Cenário: {challenge.contextNote}
+        </div>
+      )}
+
+      {/* Realistic Chat History up to currentTurn */}
+      <div className="space-y-3 mb-5">
+        {challenge.turns.slice(0, currentTurn + 1).map((turn, tIdx) => (
+          <div key={tIdx} className="space-y-2.5">
+            {/* Incoming Persona Bubble */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-start gap-2.5"
+            >
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#CE82FF] to-[#6366F1] text-white font-display font-black text-xs flex items-center justify-center shrink-0 shadow-md">
+                {challenge.personaInitials}
+              </div>
+              <div className="liquid-glass rounded-2xl rounded-tl-sm p-3.5 max-w-[85%]">
+                {tIdx === 0 && (
+                  <p className="text-[10px] font-bold text-[#CE82FF] uppercase mb-0.5">
+                    {challenge.personaName} • {challenge.personaRole}
+                  </p>
+                )}
+                <p className="text-sm font-medium text-slate-100 leading-snug">
+                  {turn.incoming}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* User Sent Bubble + Instant Micro-Feedback */}
+            {choices[tIdx] && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-end gap-1"
+              >
+                <div className="bg-gradient-to-br from-[#38C6FF] to-[#1CA3EC] rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] text-[#051520] text-sm font-bold shadow-md">
+                  {choices[tIdx].text}
+                </div>
+                <span
+                  className={`text-[11px] font-bold px-2 ${
+                    choices[tIdx].isIdeal ? 'text-[#10E8A2]' : 'text-[#FF6B6B]'
+                  }`}
+                >
+                  {choices[tIdx].feedback}
+                </span>
+              </motion.div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Reply Options for Current Turn */}
       {needsPick && !isChecked && (
         <div className="space-y-2.5">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-            Sua resposta (Turno {currentTurn + 1} de 2):
+          <p className="text-[11px] font-bold uppercase tracking-wider text-sky-300/80">
+            Como você responde? (Turno {currentTurn + 1} de {challenge.turns.length})
           </p>
           {activeTurnData.options.map((opt, idx) => (
             <motion.button
@@ -940,7 +962,7 @@ function MiniRoleplayView({
               onClick={() => onPick(opt)}
               className="w-full tactile-card-interactive p-3.5 text-left text-sm font-semibold text-slate-100"
             >
-              {opt.text}
+              "{opt.text}"
             </motion.button>
           ))}
         </div>

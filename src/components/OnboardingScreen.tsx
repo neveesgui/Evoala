@@ -125,7 +125,7 @@ export default function OnboardingScreen() {
   const areaMeta = getAreaMeta(selectedArea || 'gestao');
 
   return (
-    <div className="min-h-[100dvh] w-full relative flex items-center justify-center px-4 py-8 pt-safe pb-safe overflow-y-auto overflow-x-hidden bg-[#131F24]">
+    <div className="min-h-[100dvh] w-full relative flex items-center justify-center px-4 py-8 pt-safe pb-safe overflow-y-auto overflow-x-hidden bg-[#07111A]">
       <SkyBackground />
 
       <div className="w-full max-w-[430px] my-auto relative z-10">
@@ -140,7 +140,7 @@ export default function OnboardingScreen() {
               transition={{ type: 'spring', stiffness: 320, damping: 26 }}
               className="flex flex-col items-center"
             >
-              <CoalaMascot mood="happy" size={138} className="mb-2" />
+              <CoalaMascot pose="waving" size={140} className="mb-2" />
 
               <h1 className="font-display text-4xl font-black text-white tracking-tight mb-1">
                 Evo<span className="text-[#00CD9C]">ala</span>
@@ -202,8 +202,8 @@ export default function OnboardingScreen() {
               className="flex flex-col"
             >
               <div className="flex items-center gap-3 mb-5">
-                <CoalaMascot mood="pointing" size={76} className="shrink-0" />
-                <div className="bg-[#1B2B34] border-2 border-[#2E3F49] rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
+                <CoalaMascot pose="encouraging" size={76} className="shrink-0" />
+                <div className="liquid-glass rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
                   <span className="inline-flex items-center gap-1 text-[10px] font-extrabold tracking-widest text-[#00CD9C] uppercase mb-0.5">
                     <Briefcase size={11} /> PERFIL PROFISSIONAL
                   </span>
@@ -265,8 +265,8 @@ export default function OnboardingScreen() {
               className="flex flex-col items-center"
             >
               <div className="flex items-center gap-3 w-full mb-4">
-                <CoalaMascot mood="thinking" size={80} className="shrink-0" />
-                <div className="bg-[#1B2B34] border-2 border-[#2E3F49] rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
+                <CoalaMascot pose="thinking" size={80} className="shrink-0" />
+                <div className="liquid-glass rounded-2xl rounded-tl-sm px-4 py-3 flex-1">
                   <span className="inline-block text-[10px] font-extrabold tracking-widest text-[#CE82FF] uppercase mb-0.5">
                     NIVELAMENTO • {DIAGNOSTIC_QUESTIONS[qIndex].badge}
                   </span>
@@ -317,7 +317,7 @@ export default function OnboardingScreen() {
               transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               className="flex flex-col items-center"
             >
-              <CoalaMascot mood="celebrating" size={146} className="mb-2" />
+              <CoalaMascot pose="celebrating" size={148} className="mb-2" />
 
               <TactileCard className="w-full p-6 text-center">
                 <div className="inline-flex items-center gap-1.5 bg-[#FFC800]/15 px-3.5 py-1 rounded-full text-xs font-extrabold text-[#FFC800] mb-4">
