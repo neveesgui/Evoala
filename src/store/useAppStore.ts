@@ -18,6 +18,14 @@ export const getUserRank = (xp: number) => {
   return RANK_THRESHOLDS.slice().reverse().find((r) => xp >= r.minXp) || RANK_THRESHOLDS[0];
 };
 
+export type WorkAreaId =
+  | 'vendas'
+  | 'saude'
+  | 'gestao'
+  | 'tecnologia'
+  | 'educacao'
+  | 'estudante';
+
 export interface BehavioralMetrics {
   clarity: number;
   empathy: number;
@@ -83,6 +91,7 @@ interface AppState {
   hasCompletedLeveling: boolean;
   userName: string;
   userAge: string;
+  userArea: WorkAreaId;
   userLevel: 'Júnior' | 'Pleno' | 'Sênior' | null;
 
   // Core gamification stats
@@ -92,6 +101,7 @@ interface AppState {
   maxEnergy: number;
   leaves: number; // alias kept for compatibility
   completedLessons: string[];
+  claimedChests: string[];
   selectedUnitId: string;
 
   // Settings
@@ -109,8 +119,11 @@ interface AppState {
   completeQuickOnboarding: (
     name: string,
     startingXp: number,
-    level: 'Júnior' | 'Pleno' | 'Sênior'
+    level: 'Júnior' | 'Pleno' | 'Sênior',
+    area: WorkAreaId
   ) => void;
+  setUserArea: (area: WorkAreaId) => void;
+  claimChest: (chestId: string, xpReward: number) => void;
   completeLeveling: (level: 'Júnior' | 'Pleno' | 'Sênior', startingXp: number) => void;
   setSelectedUnit: (unitId: string) => void;
   addXp: (amount: number) => void;
@@ -132,6 +145,7 @@ export const useAppStore = create<AppState>()(
       hasCompletedLeveling: false,
       userName: '',
       userAge: '',
+      userArea: 'gestao',
       userLevel: null,
 
       xp: 150,
@@ -140,7 +154,8 @@ export const useAppStore = create<AppState>()(
       maxEnergy: 5,
       leaves: 5,
       completedLessons: [],
-      selectedUnitId: 'u1',
+      claimedChests: [],
+      selectedUnitId: 'u0',
 
       soundEnabled: true,
       isDarkMode: false,
@@ -159,20 +174,36 @@ export const useAppStore = create<AppState>()(
       completeOnboarding: (name, age = '') =>
         set({ hasOnboarded: true, userName: name.trim(), userAge: age }),
 
-      completeQuickOnboarding: (name, startingXp, level) =>
+      completeQuickOnboarding: (name, startingXp, level, area) =>
         set((state) => ({
           hasOnboarded: true,
           hasCompletedLeveling: true,
           userName: name.trim(),
           userLevel: level,
+          userArea: area,
           xp: startingXp,
           streak: 1,
           energy: 5,
           leaves: 5,
+          selectedUnitId: 'u0',
           weeklyXp: state.weeklyXp.map((w) =>
             w.isCurrent ? { ...w, xp: Math.max(w.xp, startingXp) } : w
           ),
         })),
+
+      setUserArea: (area) => set({ userArea: area }),
+
+      claimChest: (chestId, xpReward) =>
+        set((state) => {
+          if (state.claimedChests.includes(chestId)) return state;
+          return {
+            claimedChests: [...state.claimedChests, chestId],
+            xp: state.xp + xpReward,
+            weeklyXp: state.weeklyXp.map((w) =>
+              w.isCurrent ? { ...w, xp: w.xp + xpReward } : w
+            ),
+          };
+        }),
 
       completeLeveling: (level, startingXp) =>
         set({ hasCompletedLeveling: true, userLevel: level, xp: startingXp }),
@@ -274,7 +305,8 @@ export const useAppStore = create<AppState>()(
           energy: 5,
           leaves: 5,
           completedLessons: [],
-          selectedUnitId: 'u1',
+          claimedChests: [],
+          selectedUnitId: 'u0',
           metrics: {
             clarity: 62,
             empathy: 68,

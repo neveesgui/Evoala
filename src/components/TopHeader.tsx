@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Flame, Sparkles, Heart, ChevronDown, Check, RefreshCw } from 'lucide-react';
+import { Flame, Sparkles, Zap, ChevronDown, Check, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '../store/useAppStore';
-import { CURRICULUM_UNITS } from '../data/curriculum';
+import { getPersonalizedUnits, getAreaMeta } from '../data/curriculum';
 import { soundFX } from '../utils/soundEffects';
 
 interface TopHeaderProps {
@@ -10,13 +10,14 @@ interface TopHeaderProps {
 }
 
 export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
-  const { streak, xp, energy, maxEnergy, selectedUnitId, setSelectedUnit, refillEnergy } =
+  const { streak, xp, energy, maxEnergy, selectedUnitId, userArea, setSelectedUnit, refillEnergy } =
     useAppStore();
   const [unitMenuOpen, setUnitMenuOpen] = useState(false);
   const [showEnergyToast, setShowEnergyToast] = useState(false);
 
-  const currentUnit =
-    CURRICULUM_UNITS.find((u) => u.id === selectedUnitId) || CURRICULUM_UNITS[0];
+  const units = getPersonalizedUnits(userArea);
+  const currentUnit = units.find((u) => u.id === selectedUnitId) || units[0];
+  const areaMeta = getAreaMeta(userArea);
 
   const handleChooseUnit = (unitId: string) => {
     soundFX.playTap();
@@ -36,29 +37,26 @@ export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 pt-safe apple-glass border-b border-slate-200/80 px-4 py-2.5">
+    <header className="sticky top-0 z-30 pt-safe apple-glass border-b border-[#24333B] px-3 sm:px-4 py-2.5">
       <div className="flex items-center justify-between gap-2">
-        {/* Minimal Unit Selector */}
-        <div className="relative">
+        {/* Area + Unit Selector */}
+        <div className="relative min-w-0">
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => {
               soundFX.playTap();
               setUnitMenuOpen((v) => !v);
             }}
-            className="flex items-center gap-1.5 bg-slate-100/90 hover:bg-slate-200/70 px-3 py-1.5 rounded-xl cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 bg-[#1B2B34] hover:bg-[#223540] border border-[#2E3F49] px-2.5 sm:px-3 py-1.5 rounded-xl cursor-pointer transition-colors"
           >
-            <span
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: currentUnit.accentColor }}
-            />
-            <span className="font-display font-extrabold text-xs text-slate-700 max-w-[100px] truncate">
-              Unid. {currentUnit.number}
+            <span className="text-sm leading-none">{areaMeta.emoji}</span>
+            <span className="font-display font-extrabold text-xs text-slate-100 max-w-[76px] sm:max-w-[100px] truncate">
+              {areaMeta.shortLabel}
             </span>
             <ChevronDown
               size={14}
               strokeWidth={2.6}
-              className={`text-slate-500 transition-transform ${unitMenuOpen ? 'rotate-180' : ''}`}
+              className={`text-slate-400 transition-transform ${unitMenuOpen ? 'rotate-180' : ''}`}
             />
           </motion.button>
 
@@ -68,30 +66,33 @@ export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
                 initial={{ opacity: 0, y: -6, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.96 }}
-                className="absolute left-0 mt-2 w-64 tactile-card p-2 z-50"
+                className="absolute left-0 mt-2 w-68 max-w-[calc(100vw-1.5rem)] tactile-card p-2 z-50"
               >
                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2.5 py-1">
-                  Escolher Trilha
+                  Trilhas • {areaMeta.label}
                 </p>
-                {CURRICULUM_UNITS.map((unit) => {
+                {units.map((unit) => {
                   const active = unit.id === currentUnit.id;
                   return (
                     <button
                       key={unit.id}
                       onClick={() => handleChooseUnit(unit.id)}
                       className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-xl text-left transition-colors cursor-pointer ${
-                        active ? 'bg-[#F0F9FF]' : 'hover:bg-slate-50'
+                        active ? 'bg-[#1CB0F6]/15' : 'hover:bg-[#223540]'
                       }`}
                     >
                       <div className="min-w-0">
-                        <span className="block text-[10px] font-bold text-slate-400">
-                          {unit.badgeText}
+                        <span
+                          className="block text-[10px] font-extrabold uppercase"
+                          style={{ color: unit.accentColor }}
+                        >
+                          {unit.sectionLabel}
                         </span>
-                        <span className="block font-display text-xs font-extrabold text-slate-800 truncate">
+                        <span className="block font-display text-xs font-extrabold text-white truncate">
                           {unit.title}
                         </span>
                       </div>
-                      {active && <Check size={15} strokeWidth={2.8} className="text-[#58CC02] shrink-0" />}
+                      {active && <Check size={15} strokeWidth={2.8} className="text-[#00CD9C] shrink-0" />}
                     </button>
                   );
                 })}
@@ -100,26 +101,28 @@ export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
           </AnimatePresence>
         </div>
 
-        {/* Clean Duolingo-style HUD Counters */}
-        <div className="flex items-center gap-3">
+        {/* Duolingo Dark HUD Counters (XP, Streak, Pink Energy) */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
           <div className="flex items-center gap-1">
-            <Flame size={18} fill="#FF9600" className="text-[#FF9600]" strokeWidth={2} />
-            <span className="font-display font-extrabold text-sm text-[#FF9600]">{streak}</span>
+            <Sparkles size={17} fill="#FFC800" className="text-[#FFC800]" strokeWidth={2} />
+            <span className="font-display font-extrabold text-sm text-[#FFC800]">{xp}</span>
           </div>
 
           <div className="flex items-center gap-1">
-            <Sparkles size={17} fill="#FFC800" className="text-[#E5A400]" strokeWidth={2} />
-            <span className="font-display font-extrabold text-sm text-[#D99B00]">{xp}</span>
+            <Flame size={18} fill="#FF9600" className="text-[#FF9600]" strokeWidth={2} />
+            <span className="font-display font-extrabold text-sm text-[#FF9600]">{streak}</span>
           </div>
 
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={handleEnergyClick}
             title={energy < maxEnergy ? 'Toque para recarregar energia' : 'Energia cheia'}
-            className="flex items-center gap-1 cursor-pointer"
+            className="flex items-center gap-1.5 cursor-pointer"
           >
-            <Heart size={18} fill="#FF4B4B" className="text-[#FF4B4B]" strokeWidth={2} />
-            <span className="font-display font-extrabold text-sm text-[#FF4B4B]">{energy}</span>
+            <span className="inline-flex items-center justify-center w-6 h-4 rounded-[5px] bg-[#FF5E9C] text-white">
+              <Zap size={11} fill="#FFFFFF" strokeWidth={2.5} />
+            </span>
+            <span className="font-display font-extrabold text-sm text-[#FF5E9C]">{energy}</span>
             {energy < maxEnergy && <RefreshCw size={10} className="text-slate-400" />}
           </motion.button>
         </div>
@@ -131,9 +134,9 @@ export default function TopHeader({ onSelectUnit }: TopHeaderProps) {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="absolute right-4 top-13 bg-slate-900 text-white text-[11px] font-semibold px-3 py-1.5 rounded-xl shadow-lg z-50"
+            className="absolute right-4 top-13 bg-[#1B2B34] border border-[#37464F] text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-lg z-50"
           >
-            ❤️ Energia completa ({maxEnergy}/{maxEnergy})
+            ⚡ Energia recarregada ({maxEnergy}/{maxEnergy})
           </motion.div>
         )}
       </AnimatePresence>

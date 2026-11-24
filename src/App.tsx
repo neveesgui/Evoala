@@ -51,11 +51,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full relative flex justify-center overflow-hidden">
+    <div className="min-h-[100dvh] w-full relative flex justify-center overflow-hidden bg-[#0D161A]">
       <SkyBackground />
 
-      {/* Clean Apple + Modern Duolingo Centered App Frame */}
-      <div className="w-full max-w-[480px] h-[100dvh] flex flex-col relative z-10 bg-[#F7F9FA] sm:border-x sm:border-slate-200/90 sm:shadow-[0_0_40px_rgba(15,23,42,0.08)]">
+      {/* Duolingo Dark Mode Centered Mobile-First App Frame */}
+      <div className="w-full max-w-[480px] h-[100dvh] flex flex-col relative z-10 bg-[#131F24] sm:border-x sm:border-[#24333B] sm:shadow-[0_0_50px_rgba(0,0,0,0.45)]">
         <TopHeader onSelectUnit={handleSelectUnit} />
 
         <main

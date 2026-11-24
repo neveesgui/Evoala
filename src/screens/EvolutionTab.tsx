@@ -18,10 +18,10 @@ export function EvolutionTab() {
 
   const radarAxes = [
     { label: 'Clareza', value: metrics.clarity, color: '#1CB0F6' },
-    { label: 'Empatia', value: metrics.empathy, color: '#FF4B4B' },
-    { label: 'Controle', value: metrics.control, color: '#58CC02' },
+    { label: 'Empatia', value: metrics.empathy, color: '#FF5E9C' },
+    { label: 'Controle', value: metrics.control, color: '#00CD9C' },
     { label: 'Liderança', value: metrics.leadership, color: '#FFC800' },
-    { label: 'Negociação', value: metrics.negotiation, color: '#6366F1' },
+    { label: 'Negociação', value: metrics.negotiation, color: '#CE82FF' },
   ];
 
   const cx = 110;
@@ -43,18 +43,17 @@ export function EvolutionTab() {
 
   return (
     <div className="px-4 pt-5 pb-10 space-y-5">
-      {/* Header */}
       <div className="flex items-center justify-between px-1">
         <div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#58CC02] mb-0.5">
+          <span className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#00CD9C] mb-0.5">
             <TrendingUp size={12} /> Painel Comportamental
           </span>
-          <h1 className="font-display text-2xl font-black text-slate-800">Sua Evolução</h1>
+          <h1 className="font-display text-2xl font-black text-white">Sua Evolução</h1>
         </div>
 
-        <div className="bg-white border border-slate-200 shadow-xs rounded-2xl px-3.5 py-2 text-center">
+        <div className="bg-[#1B2B34] border border-[#2E3F49] rounded-2xl px-3.5 py-2 text-center">
           <span className="block text-[9px] font-bold uppercase text-slate-400">Prontidão</span>
-          <span className="font-display text-xl font-black text-[#58CC02]">{avgScore}%</span>
+          <span className="font-display text-xl font-black text-[#00CD9C]">{avgScore}%</span>
         </div>
       </div>
 
@@ -62,14 +61,14 @@ export function EvolutionTab() {
       <TactileCard className="p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="font-display text-base font-extrabold text-slate-800">
+            <h2 className="font-display text-base font-extrabold text-white">
               Ritmo das Últimas 6 Semanas
             </h2>
             <p className="text-[11px] font-medium text-slate-400">
               XP acumulado em trilhas e simulações
             </p>
           </div>
-          <span className="text-[11px] font-extrabold text-[#46A302] bg-[#EEFBE5] px-2.5 py-0.5 rounded-full">
+          <span className="text-[11px] font-extrabold text-[#00CD9C] bg-[#00CD9C]/15 px-2.5 py-0.5 rounded-full">
             {completedLessons.length} lições
           </span>
         </div>
@@ -100,13 +99,13 @@ export function EvolutionTab() {
                     animate={{ height: `${heightPct}%` }}
                     transition={{ duration: 0.65, delay: idx * 0.08, ease: 'easeOut' }}
                     className={`w-full max-w-[34px] rounded-t-xl ${
-                      point.isCurrent ? 'bg-[#58CC02]' : 'bg-[#1CB0F6]/85'
+                      point.isCurrent ? 'bg-[#00CD9C]' : 'bg-[#1CB0F6]/85'
                     }`}
                   />
                 </div>
                 <span
                   className={`text-[10px] font-bold mt-2 ${
-                    point.isCurrent ? 'text-[#46A302]' : 'text-slate-400'
+                    point.isCurrent ? 'text-[#00CD9C]' : 'text-slate-400'
                   }`}
                 >
                   {point.label}
@@ -121,18 +120,21 @@ export function EvolutionTab() {
       <TactileCard className="p-5">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="font-display text-base font-extrabold text-slate-800">
+            <h2 className="font-display text-base font-extrabold text-white">
               Radar de Soft Skills
             </h2>
             <p className="text-[11px] font-medium text-slate-400">
               Indicadores quantitativos de maturidade profissional
             </p>
           </div>
-          <Award size={20} className="text-[#6366F1]" />
+          <Award size={20} className="text-[#CE82FF]" />
         </div>
 
         <div className="flex justify-center my-2">
-          <svg width="220" height="210" viewBox="0 0 220 210" className="overflow-visible">
+          <svg
+            viewBox="-28 -12 276 234"
+            className="w-full max-w-[260px] h-auto overflow-visible"
+          >
             {[25, 50, 75, 100].map((level) => (
               <polygon
                 key={level}
@@ -143,7 +145,7 @@ export function EvolutionTab() {
                   })
                   .join(' ')}
                 fill="none"
-                stroke="#E2E8F0"
+                stroke="#2E3F49"
                 strokeWidth="1.2"
               />
             ))}
@@ -153,13 +155,13 @@ export function EvolutionTab() {
               const labelPos = getPoint(idx, 126);
               return (
                 <g key={axis.label}>
-                  <line x1={cx} y1={cy} x2={outer.x} y2={outer.y} stroke="#E2E8F0" strokeWidth="1.2" />
+                  <line x1={cx} y1={cy} x2={outer.x} y2={outer.y} stroke="#2E3F49" strokeWidth="1.2" />
                   <text
                     x={labelPos.x}
                     y={labelPos.y}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    className="fill-slate-600 text-[10px] font-bold"
+                    className="fill-slate-300 text-[10px] font-bold"
                   >
                     {axis.label}
                   </text>
@@ -172,9 +174,9 @@ export function EvolutionTab() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
               points={polygonPoints}
-              fill="#1CB0F6"
-              fillOpacity="0.2"
-              stroke="#1CB0F6"
+              fill="#00CD9C"
+              fillOpacity="0.22"
+              stroke="#00CD9C"
               strokeWidth="2.5"
               strokeLinejoin="round"
             />
@@ -188,7 +190,7 @@ export function EvolutionTab() {
                   cy={p.y}
                   r="4.5"
                   fill={axis.color}
-                  stroke="#FFFFFF"
+                  stroke="#131F24"
                   strokeWidth="2"
                 />
               );
@@ -200,13 +202,13 @@ export function EvolutionTab() {
           {radarAxes.map((axis) => (
             <div
               key={axis.label}
-              className="flex items-center justify-between bg-[#F8FAFC] rounded-xl px-3 py-2"
+              className="flex items-center justify-between bg-[#131F24] rounded-xl px-3 py-2"
             >
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: axis.color }} />
-                <span className="text-xs font-semibold text-slate-600">{axis.label}</span>
+                <span className="text-xs font-semibold text-slate-300">{axis.label}</span>
               </div>
-              <span className="font-display text-xs font-extrabold text-slate-800">
+              <span className="font-display text-xs font-extrabold text-white">
                 {axis.value}%
               </span>
             </div>
@@ -217,14 +219,14 @@ export function EvolutionTab() {
       {/* Recent Gatekeeper Simulations */}
       <TactileCard className="p-5">
         <div className="flex items-center gap-2 mb-3">
-          <BrainCircuit size={18} className="text-[#6366F1]" />
-          <h2 className="font-display text-base font-extrabold text-slate-800">
+          <BrainCircuit size={18} className="text-[#CE82FF]" />
+          <h2 className="font-display text-base font-extrabold text-white">
             Histórico do Gatekeeper IA
           </h2>
         </div>
 
         {gatekeeperHistory.length === 0 ? (
-          <p className="text-xs font-medium text-slate-400 bg-[#F8FAFC] rounded-2xl p-4 text-center">
+          <p className="text-xs font-medium text-slate-400 bg-[#131F24] rounded-2xl p-4 text-center">
             Nenhuma simulação concluída ainda. Teste um cenário na aba Gatekeeper para registrar sua
             telemetria!
           </p>
@@ -233,10 +235,10 @@ export function EvolutionTab() {
             {gatekeeperHistory.slice(0, 4).map((rec) => (
               <div
                 key={rec.id}
-                className="flex items-center justify-between bg-[#F8FAFC] rounded-2xl p-3"
+                className="flex items-center justify-between bg-[#131F24] rounded-2xl p-3"
               >
                 <div className="min-w-0 pr-2">
-                  <p className="font-display text-xs font-extrabold text-slate-800 truncate">
+                  <p className="font-display text-xs font-extrabold text-white truncate">
                     {rec.scenarioTitle}
                   </p>
                   <p className="text-[10px] font-semibold text-slate-400 mt-0.5">
@@ -245,7 +247,7 @@ export function EvolutionTab() {
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <Star size={14} fill="#FFC800" stroke="#E5A400" strokeWidth={1.8} />
-                  <span className="font-display text-xs font-extrabold text-slate-700">
+                  <span className="font-display text-xs font-extrabold text-[#FFC800]">
                     {rec.stars}/5
                   </span>
                 </div>
