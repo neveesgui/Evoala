@@ -20,12 +20,12 @@ interface TrailsTabProps {
 /** Gentle S-curve horizontal offsets */
 const S_CURVE_OFFSETS = [0, -34, -48, -18];
 
-/** Vitrified Liquid Glass Unit Banner Gradients */
+/** Vitrified Liquid Glass Unit Banner Gradients (Evoala Blue Lead Identity!) */
 const UNIT_GLASS_GRADIENTS = [
-  'linear-gradient(135deg, rgba(16, 217, 152, 0.88) 0%, rgba(41, 182, 246, 0.85) 100%)',
-  'linear-gradient(135deg, rgba(88, 204, 2, 0.86) 0%, rgba(0, 191, 165, 0.84) 100%)',
-  'linear-gradient(135deg, rgba(41, 182, 246, 0.88) 0%, rgba(99, 102, 241, 0.86) 100%)',
-  'linear-gradient(135deg, rgba(168, 85, 247, 0.86) 0%, rgba(236, 72, 153, 0.82) 100%)',
+  'linear-gradient(135deg, rgba(41, 182, 246, 0.94) 0%, rgba(2, 136, 209, 0.92) 100%)',
+  'linear-gradient(135deg, rgba(28, 176, 246, 0.9) 0%, rgba(56, 189, 248, 0.86) 100%)',
+  'linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(99, 102, 241, 0.88) 100%)',
+  'linear-gradient(135deg, rgba(124, 77, 255, 0.88) 0%, rgba(41, 182, 246, 0.86) 100%)',
 ];
 
 export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
@@ -231,7 +231,7 @@ export function TrailsTab({ onSelectLesson }: TrailsTabProps) {
                           </p>
 
                           <TactileButton
-                            variant={isCompleted ? 'gold' : 'mint'}
+                            variant={isCompleted ? 'gold' : 'blue'}
                             size="md"
                             fullWidth
                             onClick={() => {

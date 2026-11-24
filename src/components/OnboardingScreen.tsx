@@ -435,14 +435,14 @@ export default function OnboardingScreen() {
               <CoalaMascot pose="waving" size={146} className="mb-2" />
 
               <h1 className="font-display text-4xl font-black text-white tracking-tight mb-1">
-                Evo<span className="text-[#10E8A2]">ala</span>
+                EVO<span className="text-[#29B6F6]">ALA</span>
               </h1>
-              <p className="text-sm font-semibold text-slate-400 mb-6 text-center">
+              <p className="text-sm font-semibold text-sky-200/80 mb-6 text-center">
                 Desperte o seu potencial
               </p>
 
               <TactileCard className="w-full p-6">
-                <div className="inline-flex items-center gap-1.5 bg-[#10E8A2]/15 px-3 py-1 rounded-full text-[11px] font-extrabold text-[#10E8A2] mb-4">
+                <div className="inline-flex items-center gap-1.5 bg-[#29B6F6]/20 border border-[#29B6F6]/35 px-3 py-1 rounded-full text-[11px] font-extrabold text-[#38C6FF] mb-4">
                   <Sparkles size={13} />
                   SOFT SKILLS & INTELIGÊNCIA EMOCIONAL
                 </div>
@@ -472,7 +472,7 @@ export default function OnboardingScreen() {
 
                   <TactileButton
                     type="submit"
-                    variant="mint"
+                    variant="blue"
                     size="lg"
                     fullWidth
                     disabled={name.trim().length < 2}
@@ -536,7 +536,7 @@ export default function OnboardingScreen() {
               </div>
 
               <TactileButton
-                variant="mint"
+                variant="blue"
                 size="lg"
                 fullWidth
                 disabled={!selectedArea}
@@ -731,7 +731,7 @@ export default function OnboardingScreen() {
                 </div>
 
                 <TactileButton
-                  variant="mint"
+                  variant="blue"
                   size="lg"
                   fullWidth
                   onClick={() =>

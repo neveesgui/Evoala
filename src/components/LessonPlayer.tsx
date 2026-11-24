@@ -361,7 +361,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
             </motion.div>
           </div>
 
-          <TactileButton variant="mint" size="lg" fullWidth onClick={onClose}>
+          <TactileButton variant="blue" size="lg" fullWidth onClick={onClose}>
             Continuar na Trilha
           </TactileButton>
         </motion.div>
@@ -397,7 +397,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
 
           <div className="flex-1 h-4 bg-white/10 rounded-full overflow-hidden relative">
             <motion.div
-              className="h-full bg-gradient-to-r from-[#29B6F6] to-[#00E676] rounded-full relative progress-sheen"
+              className="h-full bg-gradient-to-r from-[#29B6F6] to-[#67D4FF] rounded-full relative progress-sheen"
               initial={false}
               animate={{ width: `${Math.max(8, progressPercent)}%` }}
               transition={{ type: 'spring', stiffness: 220, damping: 24 }}
@@ -588,7 +588,7 @@ export default function LessonPlayer({ lesson, onClose }: LessonPlayerProps) {
                 className="apple-glass border-t border-white/12 p-4 pb-safe"
               >
                 <TactileButton
-                  variant="mint"
+                  variant="blue"
                   size="lg"
                   fullWidth
                   disabled={!canCheck}

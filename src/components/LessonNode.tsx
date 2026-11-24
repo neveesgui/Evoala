@@ -53,7 +53,7 @@ export function LessonNode({
           transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 z-30 liquid-glass px-4 py-1.5 rounded-2xl whitespace-nowrap pointer-events-none"
         >
-          <span className="font-display text-xs font-black tracking-wider text-[#10E8A2] drop-shadow-[0_0_8px_rgba(16,232,162,0.5)]">
+          <span className="font-display text-xs font-black tracking-wider text-[#38C6FF] drop-shadow-[0_0_8px_rgba(41,182,246,0.65)]">
             COMEÇAR
           </span>
           {/* Downward Glass Pointer */}
@@ -61,13 +61,13 @@ export function LessonNode({
         </motion.div>
       )}
 
-      {/* Soft Symmetric Pulsing Ambient Halo for Active Node */}
+      {/* Soft Symmetric Pulsing Ambient Halo for Active Node (Evoala Blue) */}
       {isCurrent && (
         <div
           className="absolute inset-0 rounded-full pointer-events-none animate-pulse"
           style={{
             background:
-              'radial-gradient(circle, rgba(16,232,162,0.22) 0%, rgba(41,182,246,0.1) 55%, transparent 72%)',
+              'radial-gradient(circle, rgba(41,182,246,0.32) 0%, rgba(41,182,246,0.12) 55%, transparent 72%)',
           }}
         />
       )}
@@ -80,8 +80,8 @@ export function LessonNode({
         >
           <defs>
             <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#29B6F6" />
-              <stop offset="100%" stopColor="#00E676" />
+              <stop offset="0%" stopColor="#7DD6FF" />
+              <stop offset="100%" stopColor="#29B6F6" />
             </linearGradient>
           </defs>
           {/* Static base track */}
@@ -124,9 +124,9 @@ export function LessonNode({
               }
             : isCurrent
               ? {
-                  background: 'linear-gradient(180deg, #10E8A2 0%, #00BFA5 100%)',
+                  background: 'linear-gradient(180deg, #38C6FF 0%, #1CA3EC 100%)',
                   boxShadow:
-                    '0 6px 0 #00796B, inset 0 2px 2px rgba(255,255,255,0.65), 0 12px 26px rgba(16,232,162,0.38)',
+                    '0 6px 0 #1279B5, inset 0 2px 2px rgba(255,255,255,0.68), 0 12px 28px rgba(41,182,246,0.48)',
                 }
               : {
                   background: 'rgba(255, 255, 255, 0.07)',

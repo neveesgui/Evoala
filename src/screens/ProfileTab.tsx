@@ -162,7 +162,7 @@ export function ProfileTab() {
             </div>
             <div className="h-3 bg-[#26353D] rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#00CD9C] rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-[#29B6F6] to-[#67D4FF] rounded-full transition-all duration-500"
                 style={{ width: `${progressPct}%` }}
               />
             </div>

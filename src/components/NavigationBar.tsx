@@ -10,10 +10,10 @@ interface NavigationBarProps {
 }
 
 const TABS: { id: AppTabId; label: string; icon: typeof Home; color: string }[] = [
-  { id: 'trail', label: 'Trilha', icon: Home, color: '#10E8A2' },
+  { id: 'trail', label: 'Trilha', icon: Home, color: '#29B6F6' },
   { id: 'gatekeeper', label: 'Gatekeeper', icon: BrainCircuit, color: '#CE82FF' },
   { id: 'league', label: 'Ligas', icon: Trophy, color: '#FFD54F' },
-  { id: 'evolution', label: 'Evolução', icon: BarChart3, color: '#29B6F6' },
+  { id: 'evolution', label: 'Evolução', icon: BarChart3, color: '#38C6FF' },
   { id: 'profile', label: 'Perfil', icon: User, color: '#FF9600' },
 ];
 

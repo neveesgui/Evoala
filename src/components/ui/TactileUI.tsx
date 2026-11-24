@@ -40,7 +40,7 @@ interface TactileButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 export function TactileButton({
-  variant = 'mint',
+  variant = 'blue',
   size = 'md',
   fullWidth = false,
   silent = false,
@@ -119,29 +119,29 @@ export function TactileCard({
  */
 export function SkyBackground() {
   return (
-    <div className="pointer-events-none fixed inset-0 overflow-hidden z-0 bg-[#07111A]">
-      {/* Evoala Sky Blue top orb */}
+    <div className="pointer-events-none fixed inset-0 overflow-hidden z-0 bg-[#061320]">
+      {/* Strong Signature Evoala Sky Blue top-center aura */}
       <div
-        className="absolute -top-28 left-1/2 -translate-x-1/2 w-[560px] h-[380px] rounded-full blur-3xl"
+        className="absolute -top-24 left-1/2 -translate-x-1/2 w-[620px] h-[440px] rounded-full blur-3xl"
         style={{
           background:
-            'radial-gradient(circle, rgba(41,182,246,0.24) 0%, rgba(41,182,246,0.06) 55%, transparent 75%)',
+            'radial-gradient(circle, rgba(41,182,246,0.38) 0%, rgba(28,163,236,0.14) 52%, transparent 76%)',
         }}
       />
-      {/* Emerald left-middle orb */}
+      {/* Evoala Blue mid-left refraction orb */}
       <div
-        className="absolute top-[34%] -left-24 w-[380px] h-[380px] rounded-full blur-3xl"
+        className="absolute top-[38%] -left-24 w-[400px] h-[400px] rounded-full blur-3xl"
         style={{
           background:
-            'radial-gradient(circle, rgba(0,230,118,0.16) 0%, rgba(0,230,118,0.03) 60%, transparent 75%)',
+            'radial-gradient(circle, rgba(41,182,246,0.24) 0%, rgba(41,182,246,0.05) 60%, transparent 76%)',
         }}
       />
-      {/* Indigo right-bottom orb */}
+      {/* Deep Ocean Blue + Subtle Indigo bottom-right orb */}
       <div
-        className="absolute bottom-[-80px] -right-24 w-[420px] h-[420px] rounded-full blur-3xl"
+        className="absolute bottom-[-80px] -right-20 w-[440px] h-[440px] rounded-full blur-3xl"
         style={{
           background:
-            'radial-gradient(circle, rgba(99,102,241,0.18) 0%, rgba(99,102,241,0.04) 60%, transparent 75%)',
+            'radial-gradient(circle, rgba(2,136,209,0.28) 0%, rgba(99,102,241,0.1) 58%, transparent 76%)',
         }}
       />
     </div>

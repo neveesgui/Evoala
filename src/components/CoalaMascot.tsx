@@ -510,3 +510,150 @@ export function CoalaMascot({ pose, mood, size = 110, className = '' }: CoalaMas
     </motion.div>
   );
 }
+
+/**
+ * Iconic Evoala Koala Face-Only Logo (for Splash Screen & Brand Marks):
+ * Matches the official Evoala logo & Duolingo minimalist splash aesthetic —
+ * fluffy white scalloped ears, crisp dark outline, expressive glancing/blinking eyes,
+ * glossy black nose, happy smile and green eucalyptus leaf.
+ */
+export function CoalaFaceLogo({
+  size = 156,
+  className = '',
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial={{ scale: 0.72, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+      style={{ width: size, height: Math.round(size * 0.78) }}
+      className={`relative inline-flex items-center justify-center select-none ${className}`}
+    >
+      <svg
+        viewBox="0 0 220 172"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full overflow-visible drop-shadow-[0_10px_22px_rgba(0,0,0,0.18)]"
+      >
+        {/* Left Fluffy Ear */}
+        <motion.g
+          animate={{ rotate: [-2, 2.5, -2] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '64px', originY: '72px' }}
+        >
+          <path
+            d="M72 44 C52 20, 22 24, 14 48 C6 70, 16 98, 42 106 C54 110, 64 106, 70 98 Z"
+            fill="#FFFFFF"
+            stroke="#161C20"
+            strokeWidth="7"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M64 56 C50 42, 32 46, 28 62 C25 76, 36 90, 54 92 Z"
+            fill="#4B555E"
+          />
+          <path
+            d="M58 62 C48 54, 38 58, 36 68 C35 78, 44 86, 54 86 Z"
+            fill="#1A2128"
+          />
+        </motion.g>
+
+        {/* Right Fluffy Ear */}
+        <motion.g
+          animate={{ rotate: [2, -2.5, 2] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '156px', originY: '72px' }}
+        >
+          <path
+            d="M148 44 C168 20, 198 24, 206 48 C214 70, 204 98, 178 106 C166 110, 156 106, 150 98 Z"
+            fill="#FFFFFF"
+            stroke="#161C20"
+            strokeWidth="7"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M156 56 C170 42, 188 46, 192 62 C195 76, 184 90, 166 92 Z"
+            fill="#4B555E"
+          />
+          <path
+            d="M162 62 C172 54, 182 58, 184 68 C185 78, 176 86, 166 86 Z"
+            fill="#1A2128"
+          />
+        </motion.g>
+
+        {/* Crisp White Koala Head */}
+        <ellipse
+          cx="110"
+          cy="86"
+          rx="58"
+          ry="52"
+          fill="#FFFFFF"
+          stroke="#161C20"
+          strokeWidth="7"
+        />
+
+        {/* Expressive Blinking & Glancing Eyes */}
+        <motion.g
+          animate={{
+            scaleY: [1, 1, 0.1, 1, 1],
+            x: [0, 0, 2, -2, 0],
+          }}
+          transition={{
+            duration: 2.4,
+            times: [0, 0.35, 0.42, 0.72, 1],
+            repeat: Infinity,
+          }}
+          style={{ originY: '84px' }}
+        >
+          <circle cx="76" cy="84" r="8" fill="#161C20" />
+          <circle cx="73.2" cy="81" r="2.8" fill="#FFFFFF" />
+          <circle cx="144" cy="84" r="8" fill="#161C20" />
+          <circle cx="141.2" cy="81" r="2.8" fill="#FFFFFF" />
+        </motion.g>
+
+        {/* Signature Large Oval Black Nose */}
+        <rect x="96" y="70" width="28" height="36" rx="14" fill="#161C20" />
+        <path
+          d="M102 83 C102 77, 106 74, 111 74.5"
+          stroke="#FFFFFF"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          opacity="0.88"
+        />
+
+        {/* Happy Curved Smile */}
+        <path
+          d="M93 111 Q110 125 127 111"
+          stroke="#161C20"
+          strokeWidth="6"
+          strokeLinecap="round"
+          fill="none"
+        />
+
+        {/* Signature Green Eucalyptus Leaf */}
+        <motion.g
+          animate={{ rotate: [-5, 6, -5] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '104px', originY: '122px' }}
+        >
+          <path
+            d="M102 121 C102 138, 118 150, 134 148 C134 132, 119 120, 102 121 Z"
+            fill="#58CC02"
+            stroke="#161C20"
+            strokeWidth="4.2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M107 126 L128 143"
+            stroke="#2D7A1C"
+            strokeWidth="2.8"
+            strokeLinecap="round"
+          />
+        </motion.g>
+      </svg>
+    </motion.div>
+  );
+}
