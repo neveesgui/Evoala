@@ -31,25 +31,27 @@ function resolvePose(pose?: CoalaPose, mood?: CoalaPose | CoalaLegacyMood): Coal
 
 /**
  * Official Evoala Koala Mascot:
- * Stylized crisp white koala with clean dark contour, green eucalyptus leaf,
- * vibrant blue backpack (#29B6F6), and 9 reactive emotional poses.
+ * Faithful flat-vector recreation with fluffy scalloped white-rimmed ears,
+ * pearl-white head, large glossy black nose with curved highlight, rosy cheeks,
+ * vibrant green eucalyptus leaf, warm grey body with big white oval belly,
+ * cute jumping legs & paw pads — animated across 9 reactive poses.
  */
 export function CoalaMascot({ pose, mood, size = 110, className = '' }: CoalaMascotProps) {
   const activePose = resolvePose(pose, mood);
 
   const bodyBounce =
     activePose === 'celebrating'
-      ? { y: [0, -11, 0], rotate: [-2.5, 2.5, -2.5] }
+      ? { y: [0, -12, 0], rotate: [-3, 3, -3] }
       : activePose === 'sad'
         ? { y: [0, 3, 0] }
-        : activePose === 'encouraging' || activePose === 'thumbsUp'
-          ? { y: [0, -5, 0] }
-          : { y: [0, -3, 0] };
+        : activePose === 'waving' || activePose === 'encouraging' || activePose === 'thumbsUp'
+          ? { y: [0, -6, 0], rotate: [-1.5, 1.5, -1.5] }
+          : { y: [0, -3.5, 0] };
 
   const bodyTransition =
     activePose === 'celebrating'
       ? { duration: 0.72, repeat: Infinity, ease: 'easeInOut' as const }
-      : { duration: 2.6, repeat: Infinity, ease: 'easeInOut' as const };
+      : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' as const };
 
   return (
     <motion.div
@@ -59,363 +61,449 @@ export function CoalaMascot({ pose, mood, size = 110, className = '' }: CoalaMas
       className={`relative inline-flex items-center justify-center select-none ${className}`}
     >
       <svg
-        viewBox="0 0 160 160"
+        viewBox="0 0 200 210"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full overflow-visible drop-shadow-[0_10px_18px_rgba(0,0,0,0.35)]"
+        className="w-full h-full overflow-visible drop-shadow-[0_10px_18px_rgba(0,0,0,0.32)]"
       >
-        {/* Ambient shadow under koala */}
-        <ellipse cx="80" cy="151" rx="34" ry="5.5" fill="#000000" opacity="0.28" />
+        <defs>
+          <linearGradient id="evoalaLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#65D632" />
+            <stop offset="100%" stopColor="#3AA31F" />
+          </linearGradient>
+        </defs>
 
-        {/* === POSE-SPECIFIC BACKDROP FX === */}
+        {/* Soft ground shadow */}
+        <ellipse cx="98" cy="199" rx="38" ry="6" fill="#000000" opacity="0.22" />
 
-        {/* Golden sparkles for waving, celebrating, thumbsUp */}
+        {/* === POSE-SPECIFIC ACCENT FX === */}
         {(activePose === 'waving' || activePose === 'celebrating' || activePose === 'thumbsUp') && (
           <g>
-            <motion.path
-              d="M22 26 L24.5 20 L27 26 L33 28.5 L27 31 L24.5 37 L22 31 L16 28.5 Z"
-              fill="#FFD54F"
-              animate={{ scale: [0.85, 1.2, 0.85], opacity: [0.75, 1, 0.75] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              style={{ originX: '24px', originY: '28px' }}
+            {/* Reference-style colorful joyful rays on right */}
+            <motion.line
+              x1="168"
+              y1="100"
+              x2="180"
+              y2="92"
+              stroke="#FFC800"
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              animate={{ opacity: [0.45, 1, 0.45] }}
+              transition={{ duration: 1.1, repeat: Infinity }}
             />
+            <motion.line
+              x1="173"
+              y1="112"
+              x2="187"
+              y2="110"
+              stroke="#FFD54F"
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              animate={{ opacity: [1, 0.45, 1] }}
+              transition={{ duration: 1.1, repeat: Infinity }}
+            />
+            <motion.line
+              x1="170"
+              y1="124"
+              x2="183"
+              y2="128"
+              stroke="#7DD6FF"
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              animate={{ opacity: [0.45, 1, 0.45] }}
+              transition={{ duration: 1.1, delay: 0.2, repeat: Infinity }}
+            />
+            {/* Top golden sparkle */}
             <motion.path
-              d="M135 22 L137 17 L139 22 L144 24 L139 26 L137 31 L135 26 L130 24 Z"
+              d="M158 24 L161 16 L164 24 L172 27 L164 30 L161 38 L158 30 L150 27 Z"
               fill="#FFD54F"
-              animate={{ scale: [1.1, 0.8, 1.1], opacity: [1, 0.7, 1] }}
-              transition={{ duration: 1.7, repeat: Infinity }}
-              style={{ originX: '137px', originY: '24px' }}
+              animate={{ scale: [0.85, 1.2, 0.85] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              style={{ originX: '161px', originY: '27px' }}
             />
           </g>
         )}
 
-        {/* Blue action rays for encouraging */}
         {activePose === 'encouraging' && (
-          <g stroke="#29B6F6" strokeWidth="3.5" strokeLinecap="round">
+          <g stroke="#29B6F6" strokeWidth="4" strokeLinecap="round">
             <motion.line
-              x1="138"
-              y1="66"
-              x2="150"
-              y2="58"
+              x1="172"
+              y1="96"
+              x2="186"
+              y2="88"
               animate={{ opacity: [0.4, 1, 0.4] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
             <motion.line
-              x1="142"
-              y1="82"
-              x2="154"
-              y2="82"
+              x1="176"
+              y1="112"
+              x2="190"
+              y2="112"
               animate={{ opacity: [1, 0.4, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
             <motion.line
-              x1="138"
-              y1="98"
-              x2="150"
-              y2="105"
+              x1="172"
+              y1="128"
+              x2="186"
+              y2="135"
               animate={{ opacity: [0.4, 1, 0.4] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
           </g>
         )}
 
-        {/* Glowing blue lightbulb for idea */}
         {activePose === 'idea' && (
           <motion.g
             animate={{ y: [0, -4, 0], scale: [1, 1.08, 1] }}
             transition={{ duration: 1.4, repeat: Infinity }}
-            style={{ originX: '138px', originY: '34px' }}
+            style={{ originX: '166px', originY: '36px' }}
           >
-            <circle cx="138" cy="30" r="14" fill="#29B6F6" opacity="0.22" />
+            <circle cx="166" cy="34" r="18" fill="#29B6F6" opacity="0.24" />
             <path
-              d="M138 20 C132.5 20, 129 24, 129 28.5 C129 31.8, 131.2 34, 133 36 L133 39 L143 39 L143 36 C144.8 34, 147 31.8, 147 28.5 C147 24, 143.5 20, 138 20 Z"
+              d="M166 22 C159 22, 155 27, 155 32.5 C155 36.5, 157.8 39, 160 41.5 L160 45 L172 45 L172 41.5 C174.2 39, 177 36.5, 177 32.5 C177 27, 173 22, 166 22 Z"
               fill="#29B6F6"
-              stroke="#121E26"
-              strokeWidth="2.5"
             />
-            <rect x="134" y="39" width="8" height="4" rx="1.5" fill="#E2E8F0" stroke="#121E26" strokeWidth="2" />
-            <circle cx="136" cy="26" r="2.2" fill="#FFFFFF" opacity="0.85" />
+            <rect x="161" y="46" width="10" height="4.5" rx="2" fill="#E2E8F0" />
+            <circle cx="163" cy="30" r="2.6" fill="#FFFFFF" opacity="0.85" />
           </motion.g>
         )}
 
-        {/* Sound waves for listening */}
         {activePose === 'listening' && (
-          <g stroke="#00E676" strokeWidth="3" strokeLinecap="round" fill="none">
+          <g stroke="#00E676" strokeWidth="3.5" strokeLinecap="round" fill="none">
             <motion.path
-              d="M142 52 Q150 62 142 72"
+              d="M174 58 Q184 72 174 86"
               animate={{ opacity: [0.3, 1, 0.3] }}
               transition={{ duration: 1.1, repeat: Infinity }}
             />
             <motion.path
-              d="M149 46 Q159 62 149 78"
+              d="M183 50 Q195 72 183 94"
               animate={{ opacity: [0.2, 0.9, 0.2] }}
               transition={{ duration: 1.1, delay: 0.2, repeat: Infinity }}
             />
           </g>
         )}
 
-        {/* Question mark for confused */}
         {activePose === 'confused' && (
           <motion.text
-            x="132"
-            y="36"
+            x="160"
+            y="42"
             fill="#FFD54F"
-            fontSize="24"
+            fontSize="28"
             fontWeight="900"
             fontFamily="Nunito, sans-serif"
-            animate={{ y: [0, -4, 0], rotate: [-6, 6, -6] }}
+            animate={{ y: [0, -5, 0], rotate: [-6, 6, -6] }}
             transition={{ duration: 1.6, repeat: Infinity }}
           >
             ?
           </motion.text>
         )}
 
-        {/* === BLUE BACKPACK (#29B6F6) PEEKING BEHIND BODY === */}
-        <rect
-          x="34"
-          y="98"
-          width="92"
-          height="46"
-          rx="18"
-          fill="#29B6F6"
-          stroke="#121E26"
-          strokeWidth="3.2"
-        />
-        <rect
-          x="42"
-          y="102"
-          width="76"
-          height="12"
-          rx="6"
-          fill="#67D4FF"
-          opacity="0.45"
-        />
-
-        {/* === EARS (CRISP WHITE KOALA) === */}
-        <motion.g
-          animate={{ rotate: activePose === 'sad' ? [-9, -7, -9] : [-2.5, 2.5, -2.5] }}
-          transition={{ duration: 2.4, repeat: Infinity }}
-          style={{ originX: '44px', originY: '60px' }}
-        >
-          <circle cx="37" cy="58" r="23" fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" />
-          <circle cx="39" cy="60" r="13" fill="#E2E8F0" />
-          <circle cx="40" cy="61" r="7" fill="#FDA4AF" opacity="0.45" />
-        </motion.g>
-
-        <motion.g
-          animate={{ rotate: activePose === 'sad' ? [9, 7, 9] : [2.5, -2.5, 2.5] }}
-          transition={{ duration: 2.4, repeat: Infinity }}
-          style={{ originX: '116px', originY: '60px' }}
-        >
-          <circle cx="123" cy="58" r="23" fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" />
-          <circle cx="121" cy="60" r="13" fill="#E2E8F0" />
-          <circle cx="120" cy="61" r="7" fill="#FDA4AF" opacity="0.45" />
-        </motion.g>
-
-        {/* === BODY / TORSO === */}
+        {/* === JUMPING / PLAYFUL CHUBBY LEGS === */}
+        {/* Back/Right leg (slightly darker grey for depth) */}
         <path
-          d="M48 112 C48 98, 112 98, 112 112 L116 142 C116 148, 44 148, 44 142 Z"
-          fill="#F8FAFC"
-          stroke="#121E26"
-          strokeWidth="3.2"
-          strokeLinejoin="round"
+          d="M108 156 C122 162, 129 175, 123 186 C118 194, 104 194, 98 184 C94 178, 94 166, 96 158 Z"
+          fill="#7D858D"
         />
-        {/* Soft Belly */}
-        <ellipse cx="80" cy="131" rx="20" ry="13" fill="#E2E8F0" opacity="0.7" />
-
-        {/* Blue Backpack Straps on Shoulders */}
+        {/* Front/Left jumping bent leg */}
         <path
-          d="M55 106 C53 118, 53 130, 56 144"
-          stroke="#29B6F6"
-          strokeWidth="7.5"
-          strokeLinecap="round"
+          d="M66 146 C48 154, 42 172, 50 185 C56 194, 70 194, 78 184 C83 177, 83 166, 88 158 Z"
+          fill="#8E969E"
         />
-        <path
-          d="M105 106 C107 118, 107 130, 104 144"
-          stroke="#29B6F6"
-          strokeWidth="7.5"
-          strokeLinecap="round"
-        />
-        {/* Strap chest buckle */}
-        <rect x="66" y="121" width="28" height="5" rx="2.5" fill="#0288D1" />
-        <rect x="76" y="119.5" width="8" height="8" rx="2" fill="#E0F7FA" stroke="#121E26" strokeWidth="1.8" />
 
-        {/* === ARMS PER POSE === */}
-        {activePose === 'celebrating' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <path d="M48 118 C30 103, 24 85, 32 78 C40 72, 49 85, 56 102" />
-            <path d="M112 118 C130 103, 136 85, 128 78 C120 72, 111 85, 104 102" />
-          </g>
-        ) : activePose === 'waving' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            <motion.path
-              d="M112 116 C128 104, 138 86, 130 78 C122 72, 112 86, 106 102"
-              animate={{ rotate: [-6, 10, -6] }}
-              transition={{ duration: 0.9, repeat: Infinity }}
-              style={{ originX: '112px', originY: '114px' }}
+        {/* === BODY / TORSO (WARM GREY + BIG BRIGHT WHITE BELLY) === */}
+        <path
+          d="M62 110 C58 134, 58 162, 74 170 C90 178, 118 175, 126 162 C134 148, 130 120, 122 106 Z"
+          fill="#8E969E"
+        />
+        {/* Large Bright Oval White Belly */}
+        <ellipse
+          cx="90"
+          cy="141"
+          rx="24"
+          ry="27"
+          transform="rotate(6 90 141)"
+          fill="#F4F6F8"
+        />
+
+        {/* === ARMS WITH CUTE PAWS & DARK PAW PADS === */}
+        {activePose === 'thinking' ? (
+          <g>
+            {/* Left arm relaxed */}
+            <path
+              d="M64 118 C46 124, 40 138, 48 146 C55 152, 66 144, 72 134 Z"
+              fill="#8E969E"
+            />
+            {/* Right paw raised to chin */}
+            <path
+              d="M122 124 C132 112, 122 100, 108 104 C102 106, 104 116, 114 126 Z"
+              fill="#8E969E"
             />
           </g>
-        ) : activePose === 'thinking' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            {/* Paw resting on chin */}
-            <path d="M110 120 C112 108, 98 100, 90 102 C86 104, 88 112, 98 116" />
-          </g>
-        ) : activePose === 'encouraging' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            <motion.path
-              d="M110 116 C126 108, 142 104, 146 112 C148 119, 133 127, 112 128"
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 0.9, repeat: Infinity }}
+        ) : activePose === 'sad' ? (
+          <g>
+            <path
+              d="M64 118 C52 130, 50 146, 58 152 C65 156, 72 146, 74 132 Z"
+              fill="#8E969E"
             />
-          </g>
-        ) : activePose === 'confused' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <path d="M48 118 C32 114, 22 106, 26 98 C30 92, 42 98, 52 108" />
-            <path d="M112 118 C128 114, 138 106, 134 98 C130 92, 118 98, 108 108" />
+            <path
+              d="M122 118 C134 130, 134 146, 126 152 C119 156, 114 146, 112 132 Z"
+              fill="#8E969E"
+            />
           </g>
         ) : activePose === 'listening' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            {/* Hand cupped behind right ear */}
-            <path d="M112 114 C128 100, 138 78, 132 68 C126 62, 118 72, 114 88" />
+          <g>
+            <path
+              d="M64 118 C46 122, 38 134, 46 142 C53 148, 66 140, 72 130 Z"
+              fill="#8E969E"
+            />
+            {/* Right arm cupped behind ear */}
+            <path
+              d="M124 118 C144 108, 160 88, 154 74 C148 66, 138 76, 132 96 Z"
+              fill="#8E969E"
+            />
           </g>
         ) : activePose === 'idea' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            {/* Raised index finger paw */}
-            <path d="M112 116 C124 102, 128 80, 122 72 C117 68, 110 78, 108 98" />
-          </g>
-        ) : activePose === 'thumbsUp' ? (
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2" strokeLinecap="round">
-            <ellipse cx="47" cy="127" rx="9" ry="12" transform="rotate(-16 47 127)" />
-            {/* Thumbs up paw */}
-            <path d="M110 120 C124 114, 132 104, 130 94 C128 88, 122 90, 120 98 L112 106" />
+          <g>
+            <path
+              d="M64 118 C46 122, 38 134, 46 142 C53 148, 66 140, 72 130 Z"
+              fill="#8E969E"
+            />
+            {/* Raised pointer arm */}
+            <path
+              d="M124 118 C142 104, 152 80, 144 70 C138 64, 130 76, 124 98 Z"
+              fill="#8E969E"
+            />
           </g>
         ) : (
-          /* sad */
-          <g fill="#F8FAFC" stroke="#121E26" strokeWidth="3.2">
-            <ellipse cx="52" cy="130" rx="9" ry="12" transform="rotate(14 52 130)" />
-            <ellipse cx="108" cy="130" rx="9" ry="12" transform="rotate(-14 108 130)" />
+          /* Default joyful outstretched waving/celebrating arms matching reference image! */
+          <g>
+            {/* Left arm raised joyfully */}
+            <motion.g
+              animate={activePose === 'waving' || activePose === 'celebrating' ? { rotate: [-6, 8, -6] } : undefined}
+              transition={{ duration: 0.9, repeat: Infinity }}
+              style={{ originX: '64px', originY: '116px' }}
+            >
+              <path
+                d="M66 114 C48 106, 36 94, 32 82 C29 74, 38 68, 46 74 C52 78, 56 88, 72 98 Z"
+                fill="#8E969E"
+              />
+              {/* Cute thumb & dark paw pad */}
+              <ellipse cx="43" cy="84" rx="4.5" ry="6.5" transform="rotate(-24 43 84)" fill="#242B33" />
+            </motion.g>
+
+            {/* Right arm outstretched joyfully */}
+            <motion.g
+              animate={activePose === 'celebrating' ? { rotate: [6, -8, 6] } : { rotate: [0, -4, 0] }}
+              transition={{ duration: 1.1, repeat: Infinity }}
+              style={{ originX: '124px', originY: '118px' }}
+            >
+              <path
+                d="M120 112 C138 108, 154 102, 162 108 C168 114, 164 126, 154 128 C142 130, 130 128, 118 128 Z"
+                fill="#8E969E"
+              />
+              {/* Cute dark paw pad */}
+              <ellipse cx="151" cy="117" rx="4.5" ry="7" transform="rotate(10 151 117)" fill="#242B33" />
+            </motion.g>
           </g>
         )}
 
-        {/* === HEAD (CRISP WHITE KOALA) === */}
-        <ellipse cx="80" cy="75" rx="43" ry="38" fill="#FFFFFF" stroke="#121E26" strokeWidth="3.2" />
-        {/* Soft specular forehead sheen */}
-        <ellipse cx="80" cy="52" rx="25" ry="10" fill="#E0F2FE" opacity="0.45" />
-        {/* Cute head tuft */}
+        {/* === BIG FLUFFY SCALLOPED EARS (EXACT REFERENCE SIGNATURE!) === */}
+        {/* Left Fluffy Ear */}
+        <motion.g
+          animate={{ rotate: activePose === 'sad' ? [-8, -6, -8] : [-2.5, 2.5, -2.5] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
+          style={{ originX: '66px', originY: '60px' }}
+        >
+          {/* Fluffy white outer rim with soft scalloped fur tufts */}
+          <path
+            d="M72 34 C56 16, 34 18, 24 34 C16 42, 16 58, 22 68 C26 82, 42 90, 60 84 Z"
+            fill="#F4F6F8"
+          />
+          {/* Fluffy fur scallop accents */}
+          <path
+            d="M46 21 C40 16, 33 18, 30 24 C22 25, 18 33, 22 40 C16 48, 18 58, 25 63"
+            fill="#F4F6F8"
+          />
+          {/* Inner warm grey ear */}
+          <ellipse cx="48" cy="54" rx="21" ry="24" transform="rotate(-14 48 54)" fill="#A3ABB3" />
+          {/* Inner dark charcoal ear hollow */}
+          <ellipse cx="52" cy="58" rx="13" ry="15" transform="rotate(-14 52 58)" fill="#4D565F" />
+        </motion.g>
+
+        {/* Right Fluffy Ear */}
+        <motion.g
+          animate={{ rotate: activePose === 'sad' ? [8, 6, 8] : [2.5, -2.5, 2.5] }}
+          transition={{ duration: 2.4, repeat: Infinity }}
+          style={{ originX: '134px', originY: '68px' }}
+        >
+          {/* Fluffy white outer rim */}
+          <path
+            d="M128 44 C146 32, 168 38, 174 56 C180 68, 176 84, 166 94 C156 106, 138 108, 124 96 Z"
+            fill="#F4F6F8"
+          />
+          {/* Inner warm grey ear */}
+          <ellipse cx="148" cy="70" rx="21" ry="24" transform="rotate(18 148 70)" fill="#A3ABB3" />
+          {/* Inner dark charcoal ear hollow */}
+          <ellipse cx="142" cy="74" rx="13" ry="15" transform="rotate(18 142 74)" fill="#4D565F" />
+        </motion.g>
+
+        {/* === PEARL-WHITE ROUND KOALA HEAD === */}
+        <ellipse
+          cx="98"
+          cy="74"
+          rx="47"
+          ry="43"
+          transform="rotate(5 98 74)"
+          fill="#EDF1F4"
+        />
+        {/* Subtle bottom-chin soft grey shading */}
         <path
-          d="M72 38 C76 28, 84 28, 86 38 C90 32, 95 36, 91 42"
-          fill="#FFFFFF"
-          stroke="#121E26"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d="M56 88 C64 110, 108 122, 138 96 C126 116, 76 122, 56 88 Z"
+          fill="#D7DFE5"
+          opacity="0.7"
         />
 
-        {/* Rosy Cheeks */}
-        <ellipse cx="52" cy="84" rx="7" ry="4" fill="#FB7185" opacity="0.45" />
-        <ellipse cx="108" cy="84" rx="7" ry="4" fill="#FB7185" opacity="0.45" />
+        {/* Pastel Peach-Pink Blush Cheeks */}
+        <ellipse cx="64" cy="79" rx="9" ry="5.5" transform="rotate(6 64 79)" fill="#F7B8C4" opacity="0.72" />
+        <ellipse cx="122" cy="88" rx="9" ry="5.5" transform="rotate(6 122 88)" fill="#F7B8C4" opacity="0.72" />
 
         {/* === EYES PER POSE === */}
         {activePose === 'celebrating' ? (
-          <g stroke="#121E26" strokeWidth="3.8" strokeLinecap="round" fill="none">
-            <path d="M54 71 Q61 62 68 71" />
-            <path d="M92 71 Q99 62 106 71" />
+          <g stroke="#1A2128" strokeWidth="4.2" strokeLinecap="round" fill="none">
+            <path d="M64 67 Q71 58 78 68" />
+            <path d="M111 74 Q118 65 125 75" />
           </g>
         ) : activePose === 'encouraging' || activePose === 'thumbsUp' ? (
-          /* Winking right eye + bright left eye */
           <g>
-            <circle cx="61" cy="71" r="6.2" fill="#121E26" />
-            <circle cx="59" cy="68.8" r="2.2" fill="#FFFFFF" />
+            <circle cx="71" cy="67" r="6.5" fill="#1A2128" />
+            <circle cx="73.2" cy="64.8" r="2.3" fill="#FFFFFF" />
             <path
-              d="M92 71 Q99 64 106 71"
-              stroke="#121E26"
-              strokeWidth="3.8"
+              d="M111 75 Q118 67 125 76"
+              stroke="#1A2128"
+              strokeWidth="4.2"
               strokeLinecap="round"
               fill="none"
             />
           </g>
         ) : activePose === 'sad' ? (
-          /* Sad eyes + blue tears */
           <g>
-            <circle cx="61" cy="72" r="5.8" fill="#121E26" />
-            <circle cx="59.5" cy="70" r="2" fill="#FFFFFF" />
-            <circle cx="99" cy="72" r="5.8" fill="#121E26" />
-            <circle cx="97.5" cy="70" r="2" fill="#FFFFFF" />
-            <path d="M53 63 Q60 59 67 61" stroke="#334155" strokeWidth="2.8" strokeLinecap="round" fill="none" />
-            <path d="M107 63 Q100 59 93 61" stroke="#334155" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+            <circle cx="71" cy="68" r="6" fill="#1A2128" />
+            <circle cx="73" cy="66" r="2" fill="#FFFFFF" />
+            <circle cx="118" cy="75" r="6" fill="#1A2128" />
+            <circle cx="120" cy="73" r="2" fill="#FFFFFF" />
+            <path d="M63 59 Q70 55 77 58" stroke="#475569" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M126 67 Q119 63 112 65" stroke="#475569" strokeWidth="3" strokeLinecap="round" fill="none" />
             {/* Blue tears */}
             <motion.path
-              d="M55 80 C55 80, 59 87, 59 90 C59 92.2, 57.2 94, 55 94 C52.8 94, 51 92.2, 51 90 C51 87, 55 80, 55 80 Z"
+              d="M66 78 C66 78, 70 86, 70 89 C70 91.5, 68.2 93, 66 93 C63.8 93, 62 91.5, 62 89 C62 86, 66 78, 66 78 Z"
               fill="#29B6F6"
               animate={{ y: [0, 5, 0], opacity: [0.95, 0.5, 0.95] }}
               transition={{ duration: 1.2, repeat: Infinity }}
             />
             <motion.path
-              d="M105 80 C105 80, 109 87, 109 90 C109 92.2, 107.2 94, 105 94 C102.8 94, 101 92.2, 101 90 C101 87, 105 80, 105 80 Z"
+              d="M122 85 C122 85, 126 93, 126 96 C126 98.5, 124.2 100, 122 100 C119.8 100, 118 98.5, 118 96 C118 93, 122 85, 122 85 Z"
               fill="#29B6F6"
               animate={{ y: [0, 5, 0], opacity: [0.95, 0.5, 0.95] }}
               transition={{ duration: 1.2, delay: 0.3, repeat: Infinity }}
             />
           </g>
         ) : activePose === 'confused' ? (
-          /* Raised asymmetric eyebrow */
           <g>
-            <circle cx="61" cy="71" r="6" fill="#121E26" />
-            <circle cx="59" cy="69" r="2" fill="#FFFFFF" />
-            <circle cx="99" cy="71" r="6" fill="#121E26" />
-            <circle cx="97" cy="69" r="2" fill="#FFFFFF" />
-            <path d="M54 61 Q61 59 68 62" stroke="#121E26" strokeWidth="2.8" strokeLinecap="round" fill="none" />
-            <path d="M92 59 Q99 54 106 58" stroke="#121E26" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+            <circle cx="71" cy="67" r="6.2" fill="#1A2128" />
+            <circle cx="73" cy="65" r="2.2" fill="#FFFFFF" />
+            <circle cx="118" cy="75" r="6.2" fill="#1A2128" />
+            <circle cx="120" cy="73" r="2.2" fill="#FFFFFF" />
+            <path d="M63 58 Q70 56 77 59" stroke="#1A2128" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M111 63 Q118 57 126 62" stroke="#1A2128" strokeWidth="3" strokeLinecap="round" fill="none" />
           </g>
         ) : (
-          /* Standard blinking expressive eyes */
+          /* Signature Wide-Set Glossy Friendly Eyes */
           <motion.g
             animate={{ scaleY: [1, 1, 0.1, 1, 1] }}
             transition={{ duration: 4.2, times: [0, 0.88, 0.92, 0.96, 1], repeat: Infinity }}
-            style={{ originY: '71px' }}
+            style={{ originY: '70px' }}
           >
-            <circle cx="61" cy="71" r="6.2" fill="#121E26" />
-            <circle cx="59" cy="68.8" r="2.2" fill="#FFFFFF" />
-            <circle cx="99" cy="71" r="6.2" fill="#121E26" />
-            <circle cx="97" cy="68.8" r="2.2" fill="#FFFFFF" />
+            <circle cx="71" cy="67" r="6.5" fill="#1A2128" />
+            <circle cx="73.2" cy="64.8" r="2.4" fill="#FFFFFF" />
+            <circle cx="118" cy="75" r="6.5" fill="#1A2128" />
+            <circle cx="120.2" cy="72.8" r="2.4" fill="#FFFFFF" />
           </motion.g>
         )}
 
-        {/* Signature Oval Koala Nose */}
-        <ellipse cx="80" cy="79" rx="8.8" ry="11.5" fill="#1E293B" />
-        <ellipse cx="77" cy="74.5" rx="2.3" ry="3.5" fill="#64748B" />
+        {/* === SIGNATURE BIG GLOSSY BLACK OVAL NOSE WITH CURVED HIGHLIGHT === */}
+        <g transform="rotate(8 94 74)">
+          <rect x="81" y="57" width="26" height="33" rx="13" fill="#1A2128" />
+          {/* Crisp curved white specular shine */}
+          <path
+            d="M87 69 C87 63, 92 60.5, 97 61.5"
+            stroke="#FFFFFF"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.88"
+          />
+        </g>
 
-        {/* === MOUTH === */}
+        {/* === EXPRESSIVE MOUTH === */}
         {activePose === 'sad' ? (
-          <path d="M72 99 Q80 93 88 99" stroke="#121E26" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path
+            d="M81 102 Q91 94 102 104"
+            stroke="#1A2128"
+            strokeWidth="3.6"
+            strokeLinecap="round"
+            fill="none"
+          />
         ) : activePose === 'confused' ? (
-          <path d="M72 97 Q76 94 80 97 Q84 100 88 96" stroke="#121E26" strokeWidth="3" strokeLinecap="round" fill="none" />
-        ) : activePose === 'celebrating' ? (
-          <path d="M69 93 Q80 107 91 93 Z" fill="#FF4B4B" stroke="#121E26" strokeWidth="2.6" strokeLinejoin="round" />
+          <path
+            d="M81 98 Q86 95 92 99 Q97 102 103 98"
+            stroke="#1A2128"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            fill="none"
+          />
+        ) : activePose === 'thinking' ? (
+          <path
+            d="M83 98 Q93 102 102 97"
+            stroke="#1A2128"
+            strokeWidth="3.6"
+            strokeLinecap="round"
+            fill="none"
+          />
         ) : (
-          <path d="M71 94 Q80 102 89 94" stroke="#121E26" strokeWidth="3" strokeLinecap="round" fill="none" />
+          /* Signature Joyful Wide Open Smile + Coral Tongue */
+          <g>
+            <path
+              d="M75 91 Q92 103 109 94 C106 108, 84 111, 75 91 Z"
+              fill="#1A2128"
+            />
+            {/* Smile corner dimples */}
+            <circle cx="75" cy="91" r="2.4" fill="#1A2128" />
+            <circle cx="109" cy="94" r="2.4" fill="#1A2128" />
+            {/* Cute coral tongue */}
+            <ellipse cx="92" cy="102" rx="8" ry="4" transform="rotate(4 92 102)" fill="#EB5757" />
+          </g>
         )}
 
-        {/* === GREEN EUCALYPTUS LEAF IN MOUTH === */}
-        {activePose !== 'sad' && activePose !== 'celebrating' && (
+        {/* === SIGNATURE GREEN EUCALYPTUS LEAF TUCKED AT MOUTH === */}
+        {activePose !== 'sad' && (
           <motion.g
-            animate={{ rotate: [-4, 6, -4] }}
-            transition={{ duration: 1.7, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ originX: '88px', originY: '95px' }}
+            animate={{ rotate: [-4, 5, -4] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ originX: '84px', originY: '104px' }}
           >
             <path
-              d="M87 95 C96 89, 113 89, 118 100 C110 107, 95 105, 87 95 Z"
-              fill="#00E676"
-              stroke="#121E26"
-              strokeWidth="2.5"
+              d="M84 103 C82 117, 94 128, 108 128 C110 114, 98 103, 84 103 Z"
+              fill="url(#evoalaLeafGrad)"
+              stroke="#246B15"
+              strokeWidth="2.2"
               strokeLinejoin="round"
             />
-            <path d="M90 96 L111 99" stroke="#008C4A" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M87 107 L104 124"
+              stroke="#246B15"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </motion.g>
         )}
       </svg>

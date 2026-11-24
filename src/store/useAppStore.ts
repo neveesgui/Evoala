@@ -120,7 +120,8 @@ interface AppState {
     name: string,
     startingXp: number,
     level: 'Júnior' | 'Pleno' | 'Sênior',
-    area: WorkAreaId
+    area: WorkAreaId,
+    initialMetrics?: Partial<BehavioralMetrics>
   ) => void;
   setUserArea: (area: WorkAreaId) => void;
   claimChest: (chestId: string, xpReward: number) => void;
@@ -174,7 +175,7 @@ export const useAppStore = create<AppState>()(
       completeOnboarding: (name, age = '') =>
         set({ hasOnboarded: true, userName: name.trim(), userAge: age }),
 
-      completeQuickOnboarding: (name, startingXp, level, area) =>
+      completeQuickOnboarding: (name, startingXp, level, area, initialMetrics) =>
         set((state) => ({
           hasOnboarded: true,
           hasCompletedLeveling: true,
@@ -186,6 +187,9 @@ export const useAppStore = create<AppState>()(
           energy: 5,
           leaves: 5,
           selectedUnitId: 'u0',
+          metrics: initialMetrics
+            ? { ...state.metrics, ...initialMetrics }
+            : state.metrics,
           weeklyXp: state.weeklyXp.map((w) =>
             w.isCurrent ? { ...w, xp: Math.max(w.xp, startingXp) } : w
           ),

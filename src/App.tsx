@@ -5,6 +5,7 @@ import TopHeader from './components/TopHeader';
 import NavigationBar, { type AppTabId } from './components/NavigationBar';
 import LessonPlayer from './components/LessonPlayer';
 import OnboardingScreen from './components/OnboardingScreen';
+import SplashScreen from './components/SplashScreen';
 import { SkyBackground } from './components/ui/TactileUI';
 import { TrailsTab } from './screens/TrailsTab';
 import { GatekeeperTab } from './screens/GatekeeperTab';
@@ -14,10 +15,19 @@ import { ProfileTab } from './screens/ProfileTab';
 import type { CurriculumLesson } from './data/curriculum';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [activeTab, setActiveTab] = useState<AppTabId>('trail');
   const [activeLesson, setActiveLesson] = useState<CurriculumLesson | null>(null);
   const { hasOnboarded } = useAppStore();
   const mainRef = useRef<HTMLElement | null>(null);
+
+  if (showSplash) {
+    return (
+      <AnimatePresence mode="wait">
+        <SplashScreen key="splash" onFinish={() => setShowSplash(false)} />
+      </AnimatePresence>
+    );
+  }
 
   if (!hasOnboarded) {
     return <OnboardingScreen />;
